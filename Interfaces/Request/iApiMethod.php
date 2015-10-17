@@ -1,8 +1,6 @@
 <?php
 namespace Poirot\ApiClient;
 
-use Poirot\Core\Interfaces\EntityInterface;
-
 /**
  * Api Method Then Build Via Platform And Turn To Expression
  * That Can Send Via Connection Exec Method.
@@ -73,7 +71,7 @@ interface iApiMethod
      * - we can define default arguments with some
      *   values
      *
-     * @return EntityInterface
+     * @return array
      */
     function getArguments();
 }
