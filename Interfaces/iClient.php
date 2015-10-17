@@ -14,8 +14,8 @@ interface iClient
      * Get Request Object Interface
      *
      * - inject client to request object
-     *   * to get platform to build response/expression
-     *   * to get connection to exec expression
+     *   ! to get platform to build response/expression
+     *   ! to get connection to exec expression
      *
      * @return iApiRequest
      */
@@ -23,8 +23,9 @@ interface iClient
 
     /**
      * Get Client Platform
+     *
      * - used by request to build params for
-     *   rpc call and response
+     *   server execution call and response
      *
      * @return iPlatform
      */
