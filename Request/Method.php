@@ -1,0 +1,217 @@
+<?php
+namespace Poirot\ApiClient\Request;
+
+use Poirot\ApiClient\iApiMethod;
+use Poirot\Core\BuilderSetterTrait;
+
+class Method implements iApiMethod
+{
+    use BuilderSetterTrait;
+
+    /** @var array Method Namespaces */
+    protected $namespaces = [];
+
+    /**
+     * @var array Getter Namespaces Successive
+     *            build from getter call
+     */
+    protected $namespaces_getter = [];
+
+    /**
+     * @var array Cached State of Namespace During Getters Call
+     */
+    protected $_c__namespaces = [];
+
+    /**
+     * @var string Method
+     */
+    protected $method;
+
+    /**
+     * @var array Method Arguments
+     */
+    protected $args = [];
+
+    /**
+     * Construct
+     *
+     * - Build Method From Setter Setup Options
+     *   'namespaces'
+     *   'method'
+     *   'arguments'
+     *
+     * @param array $setupSetter
+     */
+    function __construct(array $setupSetter = null)
+    {
+       if ($setupSetter !== null)
+           $this->setupFromArray($setupSetter);
+    }
+
+    /**
+     * Get to next successive namespace
+     *
+     * @param string $namespace
+     *
+     * @return $this
+     */
+    function __get($namespace)
+    {
+        # append namespace
+        $this->namespaces_getter[] = $namespace;
+
+        return $this;
+    }
+
+    /**
+     * Call a method in this namespace.
+     *
+     * @param string $method
+     * @param array  $args
+     *
+     * @return null
+     */
+    function __call($method, $args)
+    {
+        $this->setMethod($method);
+
+        if (!empty($args) && count($args) == 2
+            && $args[0] === null
+            && is_array($args[1])
+            && array_values($args[1]) != $args[1] // associated array
+        )
+            // implement named parameters
+            // {'minuend' => 42, 'subtrahend' => 23}
+            // ->test(null, ['minuend'=>42, 'subtrahend' => 23]);
+            // class args should be ['minuend'=>42, 'subtrahend' => 23]
+            $args = $args[1];
+
+        $this->setArguments($args);
+
+        if ($this->namespaces_getter)
+            // if request build from getters set namespace and reset state
+            $this->__setNamespaceFromGetters($this->namespaces_getter);
+
+        return '';
+    }
+
+    /**
+     * Set Namespace From Getters
+     * - save current namespace state
+     * - reset getters namespace state
+     * - set namespace to getters
+     *
+     * [php]
+     * ->system->methods->Introspection(['x'=>1,])
+     * [/php]
+     *
+     * @param array $gettersNamespaces Namespaces
+     * @return $this
+     */
+    protected function __setNamespaceFromGetters(array $gettersNamespaces)
+    {
+        ($this->_c__namespaces) ?: $this->_c__namespaces = $this->namespaces;
+        $this->setNamespaces($gettersNamespaces);
+        $this->namespaces_getter = array();
+
+        return $this;
+    }
+
+    /**
+     * Set Namespaces prefix
+     *
+     * - it will replace current namespaces
+     * - use empty array to clear namespaces prefix
+     *
+     * @param array $namespaces Namespaces
+     *
+     * @return $this
+     */
+    function setNamespaces(array $namespaces = [])
+    {
+        $this->namespaces = $namespaces;
+
+        return $this;
+    }
+
+    /**
+     * Get Namespace
+     *
+     * @return array
+     */
+    function getNamespaces()
+    {
+        return $this->namespaces;
+    }
+
+    /**
+     * Add Namespace
+     *
+     * @param string $namespace Namespace
+     *
+     * @return $this
+     */
+    function addNamespace($namespace)
+    {
+        $namespaces   = $this->getNamespaces();
+        $namespaces[] = $namespace;
+
+        $this->namespaces = $namespaces;
+
+        return $this;
+    }
+
+    /**
+     * Set Method Name
+     *
+     * @param string $method Method Name
+     *
+     * @return $this
+     */
+    function setMethod($method)
+    {
+        $this->method = $method;
+
+        return $this;
+    }
+
+    /**
+     * Get Method Name
+     *
+     * @return string
+     */
+    function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * Set Method Arguments
+     *
+     * - it will replace current arguments
+     * - use empty array to clear arguments
+     *
+     * @param array $args Arguments
+     *
+     * @return $this
+     */
+    function setArguments(array $args)
+    {
+        $this->args = $args;
+
+        return $this;
+    }
+
+    /**
+     * Get Method Arguments
+     *
+     * - we can define default arguments with some
+     *   values
+     *
+     * @return array
+     */
+    function getArguments()
+    {
+        return $this->args;
+    }
+}
