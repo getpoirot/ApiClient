@@ -19,7 +19,7 @@ interface iApiRequest
     function call(iApiMethod $method = null);
 
     /**
-     * Set Rpc Client
+     * Set Client
      *
      * @param iClient $client Client
      *
@@ -28,7 +28,7 @@ interface iApiRequest
     function setClient(iClient $client);
 
     /**
-     * Get Rpc Client
+     * Get Client
      *
      * @return iClient
      */
