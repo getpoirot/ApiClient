@@ -17,7 +17,7 @@ class Request extends Method implements
      *
      * @param iClient $client
      */
-    public function __construct(iClient $client)
+    function __construct(iClient $client)
     {
         $this->setClient($client);
     }
@@ -85,4 +85,3 @@ class Request extends Method implements
         return $this->client;
     }
 }
- 
