@@ -11,6 +11,13 @@ namespace Poirot\ApiClient;
 interface iPlatform
 {
     /**
+     * Get Connection Adapter
+     *
+     * @return iConnection
+     */
+    function connection();
+
+    /**
      * Build Platform Specific Expression To Send
      * Trough Connection
      *

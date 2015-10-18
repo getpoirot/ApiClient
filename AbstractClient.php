@@ -1,8 +1,13 @@
 <?php
 namespace Poirot\ApiClient;
 
-interface iClient
+abstract class AbstractClient implements iClient
 {
+    /**
+     * @var Request
+     */
+    protected $request;
+
     /**
      * Get Request Object Interface
      *
@@ -12,7 +17,15 @@ interface iClient
      *
      * @return iApiRequest
      */
-    function request();
+    function request()
+    {
+        if (!$this->request)
+            $this->request = new Request($this);
+
+        $this->request->setClient($this);
+
+        return $this->request;
+    }
 
     /**
      * Get Client Platform
@@ -22,5 +35,5 @@ interface iClient
      *
      * @return iPlatform
      */
-    function platform();
+    abstract function platform();
 }
