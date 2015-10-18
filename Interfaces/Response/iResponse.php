@@ -8,16 +8,7 @@ interface iResponse
      *
      * @return mixed
      */
-    function getResult();
-
-    /**
-     * Set Result
-     *
-     * @param mixed $result Result
-     *
-     * @return $this
-     */
-    function setResult($result);
+    function attainResultFromBody();
 
     /**
      * Set Response Origin Content
@@ -26,14 +17,14 @@ interface iResponse
      *
      * @return $this
      */
-    function setOrigin($content);
+    function setBody($content);
 
     /**
      * Get Response Origin Body Content
      *
      * @return string
      */
-    function getOrigin();
+    function getBody();
 
     /**
      * Set Exception
@@ -44,9 +35,9 @@ interface iResponse
     function setException(\Exception $exception);
 
     /**
-     * Get Exception
+     * Has Exception?
      *
-     * @return \Exception | null
+     * @return \Exception
      */
-    function getException();
+    function hasException();
 }
