@@ -15,10 +15,14 @@ class Request extends Method implements
     /**
      * Construct
      *
+     * @param array $setupSetter
+     *
      * @param iClient $client
      */
-    function __construct(iClient $client)
+    function __construct(iClient $client, array $setupSetter = null)
     {
+        parent::__construct($setupSetter);
+
         $this->setClient($client);
     }
 
@@ -48,16 +52,13 @@ class Request extends Method implements
     {
         ($method) ?: $this;
 
-        $client   = $this->getClient();
+        $client   = $this->client();
         $platform = $client->platform();
 
-        $expr     = $platform->buildExpression($method);
+        $expr     = $platform->makeExpression($method);
+        $result   = $client->connection()->exec($expr);
 
-        $result   = $client->connection()
-            ->exec($expr);
-
-        $response = $platform->buildResponse($result);
-
+        $response = $platform->makeResponse($result);
         return $response;
     }
 
