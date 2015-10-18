@@ -2,13 +2,12 @@
 namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Request\Method;
-use Poirot\Rpc\Client\ClientInterface;
 
-class Request extends Method implements
-    iApiRequest
+class Request extends Method
+    implements iApiRequest
 {
     /**
-     * @var ClientInterface
+     * @var iClient
      */
     protected $client;
 
@@ -56,7 +55,7 @@ class Request extends Method implements
         $platform = $client->platform();
 
         $expr     = $platform->makeExpression($method);
-        $result   = $client->connection()->exec($expr);
+        $result   = $platform->connection()->exec($expr);
 
         $response = $platform->makeResponse($result);
         return $response;
