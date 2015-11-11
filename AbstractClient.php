@@ -11,15 +11,12 @@ abstract class AbstractClient implements iClient
 {
 
     /**
-     * we keep instance of all methods called in our
-     * client Object so later we can track them
-     * in our client object
-     *
-     * ['methodName'=>MethodObjectInstance , 'anotherMethodName'=> AnotherMethodObjectInstance]
+     * we keep instance of last method called in our
+     * client Object
      *
      * @var iApiMethod
      */
-    protected $methods;
+    protected $method;
 
     /**
      * Call a method in this namespace.
@@ -31,22 +28,47 @@ abstract class AbstractClient implements iClient
      */
     function __call($methodName, $args)
     {
-        if(!$this->methods[$methodName]) {
+        if(!$this->method) {
             $method = new Method(['method' => $methodName, 'args' => $args]);
-            $this->methods[] = $method;
+            $this->method = $method;
         }
-        return $this->methods[$methodName]->{$methodName}($args);
-
+        return $this->method->{$methodName}($args);
     }
 
+
     /**
-     * Send Rpc Request
+     * __get
+     * proxy function to Method class __get
+     * Get to next successive namespace
      *
-     * @param iApiMethod $method Rpc Method
+     * @param string $namespace
+     *
+     * @return $this
+     */
+    function __get($namespace)
+    {
+        return $this->method->__get($namespace);
+    }
+
+
+    /**
+     * Execute Request
+     *
+     * - get and prepare connection via platform
+     * - build method and params via platform
+     * - send request
+     * - build response via platform
+     * - return response
+     *
+     * @param iApiMethod $method Server Exec Method
+     *
+     * @throws \Exception
+     *
+     * throws Exception when $method Object is null
      *
      * @return iResponse
      */
-    function call(iApiMethod $method = null)
+    function call(iApiMethod $method)
     {
         $platform = $this->platform();
 
