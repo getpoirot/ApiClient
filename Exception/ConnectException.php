@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\ApiClient;
+namespace Poirot\ApiClient\Exception;
 
 class ConnectException extends \RuntimeException
 {
