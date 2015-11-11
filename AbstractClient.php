@@ -1,30 +1,44 @@
 <?php
 namespace Poirot\ApiClient;
 
-abstract class AbstractClient implements iClient
+use Poirot\ApiClient\Request\Method;
+
+abstract class AbstractClient extends Method
+    implements iClient
 {
     /**
-     * @var Request
+     * Call a method in this namespace.
+     *
+     * @param string $method
+     * @param array  $args
+     *
+     * @return null
      */
-    protected $request;
+    function __call($method, $args)
+    {
+        parent::__call($method, $args);
+
+        return $this->call($this);
+    }
 
     /**
-     * Get Request Object Interface
+     * Send Rpc Request
      *
-     * - inject client to request object
-     *   ! to get platform to build response/expression
-     *   ! to get connection to exec expression
+     * @param iApiMethod $method Rpc Method
      *
-     * @return iApiRequest
+     * @return iResponse
      */
-    function request()
+    function call(iApiMethod $method = null)
     {
-        if (!$this->request)
-            $this->request = new Request($this);
+        ($method) ?: $this;
 
-        $this->request->setClient($this);
+        $platform = $this->platform();
 
-        return $this->request;
+        $expr     = $platform->makeExpression($method);
+        $result   = $this->connection()->exec($expr);
+
+        $response = $platform->makeResponse($result);
+        return $response;
     }
 
     /**

@@ -1,22 +1,8 @@
 <?php
 namespace Poirot\ApiClient;
 
-/**
- * In Terms Of Platforms:
- *
- * - Json RPC can be a Platform
- * - Http Context can be a Platform
- * - Web Socket Can be a Platform
- */
 interface iPlatform
 {
-    /**
-     * Get Connection Adapter
-     *
-     * @return iConnection
-     */
-    function connection();
-
     /**
      * Build Platform Specific Expression To Send
      * Trough Connection
@@ -36,7 +22,7 @@ interface iPlatform
      * @param mixed $result Server Result
      *
      * @throws \Exception
-     * @return TODO
+     * @return iResponse
      */
     function makeResponse($result);
 }

@@ -8,19 +8,19 @@ class Method implements iApiMethod
 {
     use BuilderSetterTrait;
 
-    /** @var array Method Namespaces */
-    protected $namespaces = [];
+    /** @var array Method Namespace */
+    protected $namespace = [];
 
     /**
      * @var array Getter Namespaces Successive
      *            build from getter call
      */
-    protected $namespaces_getter = [];
+    protected $namespace_getter = [];
 
     /**
      * @var array Cached State of Namespace During Getters Call
      */
-    protected $_c__namespaces = [];
+    protected $_c__namespace = [];
 
     /**
      * @var string Method
@@ -58,7 +58,7 @@ class Method implements iApiMethod
     function __get($namespace)
     {
         # append namespace
-        $this->namespaces_getter[] = $namespace;
+        $this->namespace_getter[] = $namespace;
 
         return $this;
     }
@@ -88,9 +88,9 @@ class Method implements iApiMethod
 
         $this->setArguments($args);
 
-        if ($this->namespaces_getter)
+        if ($this->namespace_getter)
             // if request build from getters set namespace and reset state
-            $this->__setNamespaceFromGetters($this->namespaces_getter);
+            $this->__setNamespaceFromGetters($this->namespace_getter);
 
         return '';
     }
@@ -110,9 +110,9 @@ class Method implements iApiMethod
      */
     protected function __setNamespaceFromGetters(array $gettersNamespaces)
     {
-        ($this->_c__namespaces) ?: $this->_c__namespaces = $this->namespaces;
-        $this->setNamespaces($gettersNamespaces);
-        $this->namespaces_getter = array();
+        ($this->_c__namespace) ?: $this->_c__namespace = $this->namespace;
+        $this->setNamespace($gettersNamespaces);
+        $this->namespace_getter = array();
 
         return $this;
     }
@@ -127,9 +127,9 @@ class Method implements iApiMethod
      *
      * @return $this
      */
-    function setNamespaces(array $namespaces = [])
+    function setNamespace(array $namespaces = [])
     {
-        $this->namespaces = $namespaces;
+        $this->namespace = $namespaces;
 
         return $this;
     }
@@ -139,9 +139,9 @@ class Method implements iApiMethod
      *
      * @return array
      */
-    function getNamespaces()
+    function getNamespace()
     {
-        return $this->namespaces;
+        return $this->namespace;
     }
 
     /**
@@ -153,10 +153,10 @@ class Method implements iApiMethod
      */
     function addNamespace($namespace)
     {
-        $namespaces   = $this->getNamespaces();
+        $namespaces   = $this->getNamespace();
         $namespaces[] = $namespace;
 
-        $this->namespaces = $namespaces;
+        $this->namespace = $namespaces;
 
         return $this;
     }

@@ -4,15 +4,26 @@ namespace Poirot\ApiClient;
 interface iClient
 {
     /**
-     * Get Request Object Interface
+     * Get Connection Adapter
      *
-     * - inject client to request object
-     *   ! to get platform to build response/expression
-     *   ! to get connection to exec expression
-     *
-     * @return iApiRequest
+     * @return iConnection
      */
-    function request();
+    function connection();
+
+    /**
+     * Execute Request
+     *
+     * - get connection from client
+     * - build method and params via platform
+     * - send request
+     * - build response via platform
+     * - return response
+     *
+     * @param iApiMethod $method Server Exec Method
+     *
+     * @return iResponse
+     */
+    function call(iApiMethod $method = null);
 
     /**
      * Get Client Platform

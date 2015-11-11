@@ -1,23 +1,44 @@
 <?php
 namespace Poirot\ApiClient;
 
+use Poirot\Core\BuilderSetterTrait;
+use Poirot\Core\Entity;
+
 class Response implements iResponse
 {
+    use BuilderSetterTrait;
+
+    /** @var Entity */
+    protected $meta;
+
     /** @var string Origin Response Body */
     protected $body;
 
     /** @var \Exception Exception */
     protected $exception = null;
 
+    /**
+     * Construct
+     *
+     * @param array $options
+     */
+    function __construct(array $options = [])
+    {
+        if (!empty($options))
+            $this->setupFromArray($options);
+    }
 
     /**
-     * Get Response Body
+     * Meta Data Or Headers
      *
-     * @return string
+     * @return Entity
      */
-    function attainResultFromBody()
+    function meta()
     {
-        return $this->body;
+        if (!$this->meta)
+            $this->meta = new Entity;
+
+        return $this->meta;
     }
 
     /**
@@ -27,7 +48,7 @@ class Response implements iResponse
      *
      * @return $this
      */
-    function setBody($content)
+    function setRawBody($content)
     {
         $this->body = $content;
 
@@ -39,7 +60,7 @@ class Response implements iResponse
      *
      * @return string
      */
-    function getBody()
+    function getRawBody()
     {
         return $this->body;
     }
@@ -65,5 +86,15 @@ class Response implements iResponse
     function hasException()
     {
         return $this->exception;
+    }
+
+    /**
+     * Get Response Body
+     *
+     * @return string
+     */
+    function process()
+    {
+        return $this->body;
     }
 }

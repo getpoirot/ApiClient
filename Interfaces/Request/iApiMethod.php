@@ -19,23 +19,14 @@ interface iApiMethod
      *
      * @return $this
      */
-    function setNamespaces(array $namespace);
-
-    /**
-     * Add Namespace
-     *
-     * @param string $namespace Namespace
-     *
-     * @return $this
-     */
-    function addNamespace($namespace);
+    function setNamespace(array $namespace);
 
     /**
      * Get Namespace
      *
      * @return array
      */
-    function getNamespaces();
+    function getNamespace();
 
     /**
      * Set Method Name

@@ -1,14 +1,16 @@
 <?php
 namespace Poirot\ApiClient;
 
+use Poirot\Core\Entity;
+
 interface iResponse
 {
     /**
-     * Get Response Result
+     * Meta Data Or Headers
      *
-     * @return mixed
+     * @return Entity
      */
-    function attainResultFromBody();
+    function meta();
 
     /**
      * Set Response Origin Content
@@ -17,14 +19,14 @@ interface iResponse
      *
      * @return $this
      */
-    function setBody($content);
+    function setRawBody($content);
 
     /**
      * Get Response Origin Body Content
      *
      * @return string
      */
-    function getBody();
+    function getRawBody();
 
     /**
      * Set Exception
@@ -37,7 +39,14 @@ interface iResponse
     /**
      * Has Exception?
      *
-     * @return \Exception
+     * @return \Exception|false
      */
     function hasException();
+
+    /**
+     * Process Raw Body As Result
+     *
+     * @return mixed
+     */
+    function process();
 }
