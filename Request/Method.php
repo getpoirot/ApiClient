@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\ApiClient\Request;
 
-use Poirot\ApiClient\iApiMethod;
+use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\Core\BuilderSetterTrait;
 
 class Method implements iApiMethod

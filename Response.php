@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\ApiClient;
 
+use Poirot\ApiClient\Interfaces\Response\iResponse;
 use Poirot\Core\BuilderSetterTrait;
 use Poirot\Core\Entity;
 

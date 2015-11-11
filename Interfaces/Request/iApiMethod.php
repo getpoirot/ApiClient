@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\ApiClient;
+namespace Poirot\ApiClient\Interfaces\Request;
 
 /**
  * Api Method Then Build Via Platform And Turn To Expression

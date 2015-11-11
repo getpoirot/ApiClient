@@ -1,6 +1,10 @@
 <?php
 namespace Poirot\ApiClient;
 
+use Poirot\ApiClient\Interfaces\iClient;
+use Poirot\ApiClient\Interfaces\iPlatform;
+use Poirot\ApiClient\Interfaces\Request\iApiMethod;
+use Poirot\ApiClient\Interfaces\Response\iResponse;
 use Poirot\ApiClient\Request\Method;
 
 abstract class AbstractClient extends Method

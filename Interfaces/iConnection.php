@@ -1,6 +1,7 @@
 <?php
-namespace Poirot\ApiClient;
+namespace Poirot\ApiClient\Interfaces;
 
+use Poirot\ApiClient\ConnectException;
 use Poirot\Core\Interfaces\OptionsProviderInterface;
 use Poirot\Rpc\Exception\ConnectionExecException;
 

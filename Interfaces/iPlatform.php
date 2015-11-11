@@ -1,5 +1,8 @@
 <?php
-namespace Poirot\ApiClient;
+namespace Poirot\ApiClient\Interfaces;
+
+use Poirot\ApiClient\Interfaces\Request\iApiMethod;
+use Poirot\ApiClient\Interfaces\Response\iResponse;
 
 interface iPlatform
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\ApiClient;
+namespace Poirot\ApiClient\Interfaces\Response;
 
 use Poirot\Core\Entity;
 
