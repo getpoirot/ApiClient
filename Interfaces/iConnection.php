@@ -50,4 +50,12 @@ interface iConnection extends OptionsProviderInterface
      * @return mixed
      */
     function getResourceOrigin();
+
+
+
+    /**
+     * Close Connection
+     * @return void
+     */
+    function close();
 }
