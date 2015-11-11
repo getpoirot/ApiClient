@@ -13,7 +13,7 @@ interface iClient
     /**
      * Execute Request
      *
-     * - get connection from client
+     * - get and prepare connection via platform
      * - build method and params via platform
      * - send request
      * - build response via platform

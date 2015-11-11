@@ -4,6 +4,20 @@ namespace Poirot\ApiClient;
 interface iPlatform
 {
     /**
+     * Prepare Connection To Make Call
+     *
+     * - validate connection
+     * - manipulate header or something in connection
+     * - get connect to resource
+     *
+     * @param iConnection $connection
+     *
+     * @throws \Exception
+     * @return void
+     */
+    function prepareConnection(iConnection $connection);
+
+    /**
      * Build Platform Specific Expression To Send
      * Trough Connection
      *
