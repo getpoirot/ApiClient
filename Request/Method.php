@@ -71,7 +71,7 @@ class Method implements iApiMethod
      *
      * @return null
      */
-    function __call($method , $args)
+    function __call($method, $args)
     {
         $this->setMethod($method);
 

@@ -32,7 +32,8 @@ abstract class AbstractClient implements iClient
             $method = new Method(['method' => $methodName, 'args' => $args]);
             $this->method = $method;
         }
-        return $this->method->{$methodName}($args);
+
+        return $this->call($this->method);
     }
 
 
