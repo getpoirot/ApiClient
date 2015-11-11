@@ -7,22 +7,36 @@ use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 use Poirot\ApiClient\Request\Method;
 
-abstract class AbstractClient extends Method
-    implements iClient
+abstract class AbstractClient implements iClient
 {
+
+    /**
+     * we keep instance of all methods called in our
+     * client Object so later we can track them
+     * in our client object
+     *
+     * ['methodName'=>MethodObjectInstance , 'anotherMethodName'=> AnotherMethodObjectInstance]
+     *
+     * @var iApiMethod
+     */
+    protected $methods;
+
     /**
      * Call a method in this namespace.
      *
-     * @param string $method
+     * @param string $methodName
      * @param array  $args
      *
      * @return null
      */
-    function __call($method, $args)
+    function __call($methodName, $args)
     {
-        parent::__call($method, $args);
+        if(!$this->methods[$methodName]) {
+            $method = new Method(['method' => $methodName, 'args' => $args]);
+            $this->methods[] = $method;
+        }
+        return $this->methods[$methodName]->{$methodName}($args);
 
-        return $this->call($this);
     }
 
     /**
@@ -34,8 +48,6 @@ abstract class AbstractClient extends Method
      */
     function call(iApiMethod $method = null)
     {
-        ($method) ?: $this;
-
         $platform = $this->platform();
 
         $expr     = $platform->makeExpression($method);
