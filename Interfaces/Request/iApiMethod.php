@@ -42,6 +42,8 @@ interface iApiMethod
      *
      * @return string
      */
+
+
     function getMethod();
 
     /**

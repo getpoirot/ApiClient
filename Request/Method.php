@@ -66,12 +66,12 @@ class Method implements iApiMethod
     /**
      * Call a method in this namespace.
      *
-     * @param string $method
-     * @param array  $args
+     * @param $method
+     * @param $args
      *
      * @return null
      */
-    function __call($method, $args)
+    function __call($method , $args)
     {
         $this->setMethod($method);
 

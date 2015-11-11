@@ -7,35 +7,69 @@ use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 use Poirot\ApiClient\Request\Method;
 
-abstract class AbstractClient extends Method
-    implements iClient
+abstract class AbstractClient implements iClient
 {
+
+    /**
+     * we keep instance of last method called in our
+     * client Object
+     *
+     * @var iApiMethod
+     */
+    protected $method;
+
     /**
      * Call a method in this namespace.
      *
-     * @param string $method
+     * @param string $methodName
      * @param array  $args
      *
      * @return null
      */
-    function __call($method, $args)
+    function __call($methodName, $args)
     {
-        parent::__call($method, $args);
-
-        return $this->call($this);
+        if(!$this->method) {
+            $method = new Method(['method' => $methodName, 'args' => $args]);
+            $this->method = $method;
+        }
+        return $this->method->{$methodName}($args);
     }
 
+
     /**
-     * Send Rpc Request
+     * __get
+     * proxy function to Method class __get
+     * Get to next successive namespace
      *
-     * @param iApiMethod $method Rpc Method
+     * @param string $namespace
+     *
+     * @return $this
+     */
+    function __get($namespace)
+    {
+        return $this->method->__get($namespace);
+    }
+
+
+    /**
+     * Execute Request
+     *
+     * - get and prepare connection via platform
+     * - build method and params via platform
+     * - send request
+     * - build response via platform
+     * - return response
+     *
+     * @param iApiMethod $method Server Exec Method
+     *
+     * @throws \Exception
+     *
+     * throws Exception when $method Object is null
      *
      * @return iResponse
      */
-    function call(iApiMethod $method = null)
+    function call(iApiMethod $method)
     {
-        ($method) ?: $this;
-
         $platform = $this->platform();
 
         $expr     = $platform->makeExpression($method);

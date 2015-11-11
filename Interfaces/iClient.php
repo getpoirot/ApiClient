@@ -24,9 +24,13 @@ interface iClient
      *
      * @param iApiMethod $method Server Exec Method
      *
+     * @throws \Exception
+     *
+     * throws Exception when $method Object is null
+     *
      * @return iResponse
      */
-    function call(iApiMethod $method = null);
+    function call(iApiMethod $method);
 
     /**
      * Get Client Platform
