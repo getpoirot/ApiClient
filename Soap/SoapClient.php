@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\ApiClient\Soap;
 
+use Poirot\ApiClient\AbstractClient;
 use Poirot\ApiClient\Interfaces\iConnection;
 use Poirot\ApiClient\Interfaces\iPlatform;
 

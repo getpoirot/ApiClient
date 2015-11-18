@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\ApiClient\Soap;
 
+use Poirot\ApiClient\AbstractConnection;
 use Poirot\ApiClient\Exception\ConnectException;
 use Poirot\Core\AbstractOptions;
 use Poirot\ApiClient\Exception\ApiCallException;
