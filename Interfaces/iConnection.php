@@ -1,9 +1,9 @@
 <?php
 namespace Poirot\ApiClient\Interfaces;
 
-use Poirot\ApiClient\ConnectException;
+use Poirot\ApiClient\Exception\ApiCallException;
+use Poirot\ApiClient\Exception\ConnectException;
 use Poirot\Core\Interfaces\OptionsProviderInterface;
-use Poirot\Rpc\Exception\ConnectionExecException;
 
 /**
  * - Connect To Server With Configuration From Options
@@ -30,7 +30,7 @@ interface iConnection extends OptionsProviderInterface
      *
      * @param mixed $expr Expression
      *
-     * @throws ConnectionExecException
+     * @throws ApiCallException
      * @return mixed Server Result
      */
     function exec($expr);

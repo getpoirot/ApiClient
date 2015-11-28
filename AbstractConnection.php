@@ -1,12 +1,13 @@
 <?php
 namespace Poirot\ApiClient;
 
+use Poirot\ApiClient\Exception\ApiCallException;
+use Poirot\ApiClient\Exception\ConnectException;
 use Poirot\ApiClient\Interfaces\iConnection;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\Interfaces\iDataSetConveyor;
 use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Core\OpenOptions;
-use Poirot\Rpc\Exception\ConnectionExecException;
 
 abstract class AbstractConnection implements iConnection
 {
@@ -46,7 +47,7 @@ abstract class AbstractConnection implements iConnection
      *
      * @param mixed $expr Expression
      *
-     * @throws ConnectionExecException
+     * @throws ApiCallException
      * @return mixed Server Result
      */
     abstract function exec($expr);
