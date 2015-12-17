@@ -8,6 +8,7 @@ use Poirot\Core\AbstractOptions;
 use Poirot\Core\Interfaces\iDataSetConveyor;
 use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Core\OpenOptions;
+use Poirot\Stream\Streamable;
 
 abstract class AbstractConnection implements iConnection
 {
@@ -40,7 +41,7 @@ abstract class AbstractConnection implements iConnection
     abstract function getConnect();
 
     /**
-     * Execute Expression
+     * Send Expression To Server
      *
      * - send expression to server through connection
      *   resource
@@ -48,9 +49,21 @@ abstract class AbstractConnection implements iConnection
      * @param mixed $expr Expression
      *
      * @throws ApiCallException
-     * @return mixed Server Result
+     * @return mixed Prepared Server Response
      */
-    abstract function exec($expr);
+    abstract function send($expr);
+
+    /**
+     * Receive Server Response
+     *
+     * - it will executed after a request call to server
+     *   by send expression
+     * - return null if request not sent
+     *
+     * @throws \Exception No Connection established
+     * @return null|string|Streamable
+     */
+    abstract function receive();
 
     /**
      * Is Connection Resource Available?
@@ -60,14 +73,12 @@ abstract class AbstractConnection implements iConnection
     abstract function isConnected();
 
     /**
-     * Get Connection Resource Origin
-     *
-     * ! in case of streams connection it will return
-     *   open read stream resource
-     *
-     * @return mixed
+     * Close Connection
+     * @return void
      */
-    abstract function getResourceOrigin();
+    abstract function close();
+
+    // ...
 
     /**
      * @return AbstractOptions

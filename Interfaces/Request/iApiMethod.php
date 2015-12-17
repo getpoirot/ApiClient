@@ -5,7 +5,7 @@ namespace Poirot\ApiClient\Interfaces\Request;
  * Api Method Then Build Via Platform And Turn To Expression
  * That Can Send Via Connection Exec Method.
  *
- * @see iConnection::exec
+ * @see iConnection::send
  */
 interface iApiMethod
 {

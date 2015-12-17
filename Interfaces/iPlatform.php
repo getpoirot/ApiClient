@@ -16,7 +16,7 @@ interface iPlatform
      * @param iConnection $connection
      *
      * @throws \Exception
-     * @return void
+     * @return iConnection
      */
     function prepareConnection(iConnection $connection);
 

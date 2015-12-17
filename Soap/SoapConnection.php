@@ -117,7 +117,7 @@ class SoapConnection extends AbstractConnection
      * @throws ApiCallException
      * @return mixed Server Result
      */
-    function exec($expr)
+    function send($expr)
     {
         if($this->connection)
             return $this->result = $this->connection->__soapCall($expr['function_name'], $expr['arguments'], $expr['options'], $expr['input_headers'] , $expr['output_headers']);

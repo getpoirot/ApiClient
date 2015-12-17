@@ -9,7 +9,6 @@ use Poirot\ApiClient\Request\Method;
 
 abstract class AbstractClient implements iClient
 {
-
     /**
      * we keep instance of last method called in our
      * client Object
@@ -55,10 +54,10 @@ abstract class AbstractClient implements iClient
     /**
      * Execute Request
      *
-     * - get and prepare connection via platform
-     * - build method and params via platform
-     * - send request
-     * - build response via platform
+     * - prepare/validate connection with platform
+     * - build expression via method/params with platform
+     * - send expression as request with connection
+     *    . build response with platform
      * - return response
      *
      * @param iApiMethod $method Server Exec Method
@@ -73,10 +72,11 @@ abstract class AbstractClient implements iClient
     {
         $platform = $this->platform();
 
-        $expr     = $platform->makeExpression($method);
-        $result   = $this->connection()->exec($expr);
+        $response = $platform->makeResponse(
+            $platform->prepareConnection($this->connection())
+                ->send($platform->makeExpression($method))
+        );
 
-        $response = $platform->makeResponse($result);
         return $response;
     }
 

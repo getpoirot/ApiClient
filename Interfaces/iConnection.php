@@ -4,6 +4,7 @@ namespace Poirot\ApiClient\Interfaces;
 use Poirot\ApiClient\Exception\ApiCallException;
 use Poirot\ApiClient\Exception\ConnectException;
 use Poirot\Core\Interfaces\OptionsProviderInterface;
+use Poirot\Stream\Streamable;
 
 /**
  * - Connect To Server With Configuration From Options
@@ -23,7 +24,7 @@ interface iConnection extends OptionsProviderInterface
     function getConnect();
 
     /**
-     * Execute Expression
+     * Send Expression To Server
      *
      * - send expression to server through connection
      *   resource
@@ -31,9 +32,21 @@ interface iConnection extends OptionsProviderInterface
      * @param mixed $expr Expression
      *
      * @throws ApiCallException
-     * @return mixed Server Result
+     * @return mixed Prepared Server Response
      */
-    function exec($expr);
+    function send($expr);
+
+    /**
+     * Receive Server Response
+     *
+     * - it will executed after a request call to server
+     *   by send expression
+     * - return null if request not sent
+     *
+     * @throws \Exception No Connection established
+     * @return null|string|Streamable
+     */
+    function receive();
 
     /**
      * Is Connection Resource Available?
@@ -41,16 +54,6 @@ interface iConnection extends OptionsProviderInterface
      * @return bool
      */
     function isConnected();
-
-    /**
-     * Get Connection Resource Origin
-     *
-     * ! in case of streams connection it will return
-     *   open read stream resource
-     *
-     * @return mixed
-     */
-    function getResourceOrigin();
 
     /**
      * Close Connection

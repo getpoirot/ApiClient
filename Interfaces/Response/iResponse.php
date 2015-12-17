@@ -2,6 +2,7 @@
 namespace Poirot\ApiClient\Interfaces\Response;
 
 use Poirot\Core\Entity;
+use Poirot\Stream\Interfaces\iStreamable;
 
 interface iResponse
 {
@@ -15,7 +16,7 @@ interface iResponse
     /**
      * Set Response Origin Content
      *
-     * @param string $content Content Body
+     * @param string|iStreamable $content Content Body
      *
      * @return $this
      */
@@ -24,7 +25,7 @@ interface iResponse
     /**
      * Get Response Origin Body Content
      *
-     * @return string
+     * @return string|iStreamable
      */
     function getRawBody();
 

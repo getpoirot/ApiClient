@@ -16,10 +16,10 @@ interface iClient
     /**
      * Execute Request
      *
-     * - get and prepare connection via platform
-     * - build method and params via platform
-     * - send request
-     * - build response via platform
+     * - prepare/validate connection with platform
+     * - build expression via method/params with platform
+     * - send expression as request with connection
+     *    . build response with platform
      * - return response
      *
      * @param iApiMethod $method Server Exec Method
