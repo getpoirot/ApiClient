@@ -97,7 +97,7 @@ class SoapConnection extends AbstractConnection
      */
     function getConnect()
     {
-        $options = $this->options()->toArray();
+        $options = $this->inOptions()->toArray();
 
         $wsdl = empty($options['wsdl']) ? null : $options['wsdl'];
         $args = isset($options['options']) ? $options['options'] : [];

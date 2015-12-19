@@ -3,7 +3,7 @@ namespace Poirot\ApiClient\Interfaces;
 
 use Poirot\ApiClient\Exception\ApiCallException;
 use Poirot\ApiClient\Exception\ConnectException;
-use Poirot\Core\Interfaces\OptionsProviderInterface;
+use Poirot\Core\Interfaces\iOptionsProvider;
 use Poirot\Stream\Streamable;
 
 /**
@@ -11,7 +11,7 @@ use Poirot\Stream\Streamable;
  * - Make Request To Server With Specific Expression
  * - Get Response Message From Server
  */
-interface iConnection extends OptionsProviderInterface
+interface iConnection extends iOptionsProvider
 {
     /**
      * Get Prepared Resource Connection
@@ -28,6 +28,7 @@ interface iConnection extends OptionsProviderInterface
      *
      * - send expression to server through connection
      *   resource
+     * - get connect if connection not stablished yet
      *
      * @param mixed $expr Expression
      *

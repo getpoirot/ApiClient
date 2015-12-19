@@ -27,7 +27,7 @@ abstract class AbstractConnection implements iConnection
         if ($options === null)
             return;
 
-        $this->options()->from($options);
+        $this->inOptions()->from($options);
     }
 
     /**
@@ -45,6 +45,7 @@ abstract class AbstractConnection implements iConnection
      *
      * - send expression to server through connection
      *   resource
+     * - get connect if connection not stablished yet
      *
      * @param mixed $expr Expression
      *
@@ -83,10 +84,10 @@ abstract class AbstractConnection implements iConnection
     /**
      * @return AbstractOptions
      */
-    function options()
+    function inOptions()
     {
         if (!$this->options)
-            $this->options = self::optionsIns();
+            $this->options = self::newOptions();
 
         return $this->options;
     }
@@ -105,7 +106,7 @@ abstract class AbstractConnection implements iConnection
      *
      * @return AbstractOptions
      */
-    static function optionsIns()
+    static function newOptions()
     {
         return new OpenOptions;
     }
