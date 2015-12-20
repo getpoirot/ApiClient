@@ -8,10 +8,13 @@ use Poirot\Core\AbstractOptions;
 use Poirot\Core\Interfaces\iDataSetConveyor;
 use Poirot\Core\Interfaces\iPoirotOptions;
 use Poirot\Core\OpenOptions;
+use Poirot\Core\Traits\CloneTrait;
 use Poirot\Stream\Streamable;
 
 abstract class AbstractConnection implements iConnection
 {
+    use CloneTrait;
+
     /** @var iPoirotOptions */
     protected $options;
 
