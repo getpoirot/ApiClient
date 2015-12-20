@@ -23,7 +23,7 @@ abstract class AbstractClient implements iClient
      * @param string $methodName
      * @param array  $args
      *
-     * @return null
+     * @return iResponse
      */
     function __call($methodName, $args)
     {

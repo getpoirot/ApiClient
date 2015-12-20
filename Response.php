@@ -13,7 +13,7 @@ class Response implements iResponse
     protected $meta;
 
     /** @var string Origin Response Body */
-    protected $body;
+    protected $origin;
 
     /** @var \Exception Exception */
     protected $exception = null;
@@ -51,7 +51,7 @@ class Response implements iResponse
      */
     function setRawBody($content)
     {
-        $this->body = $content;
+        $this->origin = $content;
 
         return $this;
     }
@@ -63,7 +63,7 @@ class Response implements iResponse
      */
     function getRawBody()
     {
-        return $this->body;
+        return $this->origin;
     }
 
     /**
@@ -90,12 +90,17 @@ class Response implements iResponse
     }
 
     /**
-     * Get Response Body
+     * Process Raw Body As Result
      *
-     * @return string
+     * :proc
+     * mixed function($originResult);
+     *
+     * @param callable $proc
+     *
+     * @return mixed
      */
-    function process()
+    function getResult(callable $proc = null)
     {
-        return $this->body;
+        return $this->origin;
     }
 }

@@ -47,7 +47,12 @@ interface iResponse
     /**
      * Process Raw Body As Result
      *
+     * :proc
+     * mixed function($originResult);
+     *
+     * @param callable $proc
+     *
      * @return mixed
      */
-    function process();
+    function getResult(callable $proc = null);
 }
