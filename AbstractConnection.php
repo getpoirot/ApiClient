@@ -87,7 +87,7 @@ abstract class AbstractConnection implements iConnection
     function inOptions()
     {
         if (!$this->options)
-            $this->options = self::newOptions();
+            $this->options = static::newOptions();
 
         return $this->options;
     }
