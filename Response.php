@@ -101,6 +101,9 @@ class Response implements iResponse
      */
     function getResult(callable $proc = null)
     {
-        return $this->origin;
+        if ($proc !== null)
+            return call_user_func($proc, $this->origin);
+        else
+            return $this->origin;
     }
 }

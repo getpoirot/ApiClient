@@ -72,9 +72,11 @@ abstract class AbstractClient implements iClient
     {
         $platform = $this->platform();
 
+        $connection = clone $this->connection();
+        $connection = $platform->prepareConnection($connection);
+
         $response = $platform->makeResponse(
-            $platform->prepareConnection($this->connection())
-                ->send($platform->makeExpression($method))
+                $connection->send($platform->makeExpression($method))
         );
 
         return $response;
