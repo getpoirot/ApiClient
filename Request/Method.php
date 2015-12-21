@@ -3,7 +3,6 @@ namespace Poirot\ApiClient\Request;
 
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\Core\BuilderSetterTrait;
-use Poirot\Core\Interfaces\iDataSetConveyor;
 
 class Method implements iApiMethod
 {
