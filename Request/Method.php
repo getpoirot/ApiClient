@@ -3,6 +3,7 @@ namespace Poirot\ApiClient\Request;
 
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\Core\BuilderSetterTrait;
+use Poirot\Core\Interfaces\iDataSetConveyor;
 
 class Method implements iApiMethod
 {
@@ -213,5 +214,33 @@ class Method implements iApiMethod
     function getArguments()
     {
         return $this->args;
+    }
+
+    /**
+     * Set Options From Array
+     *
+     * @param array $options Options Array
+     *
+     * @throws \Exception
+     * @return $this
+     */
+    function fromArray(array $options)
+    {
+        $this->setupFromArray($options);
+        return $this;
+    }
+
+    /**
+     * Get Properties as array
+     *
+     * @return array
+     */
+    function toArray()
+    {
+        return [
+            'namespace' => $this->getNamespace(),
+            'method'    => $this->getMethod(),
+            'arguments' => $this->getArguments(),
+        ];
     }
 }

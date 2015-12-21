@@ -1,5 +1,6 @@
 <?php
 namespace Poirot\ApiClient\Interfaces\Request;
+use Poirot\Core\Interfaces\iDataSetConveyor;
 
 /**
  * Api Method Then Build Via Platform And Turn To Expression
@@ -7,7 +8,7 @@ namespace Poirot\ApiClient\Interfaces\Request;
  *
  * @see iConnection::send
  */
-interface iApiMethod
+interface iApiMethod extends iDataSetConveyor
 {
     /**
      * Set Namespaces prefix
@@ -42,8 +43,6 @@ interface iApiMethod
      *
      * @return string
      */
-
-
     function getMethod();
 
     /**
