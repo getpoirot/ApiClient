@@ -36,10 +36,10 @@ interface iPlatform
      * - Result must be compatible with platform
      * - Throw exceptions if response has error
      *
-     * @param mixed $result Server Result
+     * @param mixed $response Server Result
      *
      * @throws \Exception
      * @return iResponse
      */
-    function makeResponse($result);
+    function makeResponse($response);
 }

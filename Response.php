@@ -99,7 +99,7 @@ class Response implements iResponse
      *
      * @return mixed
      */
-    function getResult(callable $proc = null)
+    function expected(callable $proc = null)
     {
         if ($proc !== null)
             return call_user_func($proc, $this->origin);

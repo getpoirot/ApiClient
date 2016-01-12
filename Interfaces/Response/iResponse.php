@@ -45,7 +45,7 @@ interface iResponse
     function hasException();
 
     /**
-     * Process Raw Body As Result
+     * Process Raw Body As Expected Result
      *
      * :proc
      * mixed function($originResult);
@@ -54,5 +54,5 @@ interface iResponse
      *
      * @return mixed
      */
-    function getResult(callable $proc = null);
+    function expected(callable $proc = null);
 }
