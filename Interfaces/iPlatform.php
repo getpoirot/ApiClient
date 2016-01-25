@@ -13,12 +13,13 @@ interface iPlatform
      * - manipulate header or something in connection
      * - get connect to resource
      *
-     * @param iConnection $connection
+     * @param iConnection      $connection
+     * @param iApiMethod|null  $method
      *
      * @throws \Exception
      * @return iConnection
      */
-    function prepareConnection(iConnection $connection);
+    function prepareConnection(iConnection $connection, $method = null);
 
     /**
      * Build Platform Specific Expression To Send

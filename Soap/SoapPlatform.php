@@ -60,11 +60,12 @@ class SoapPlatform implements iPlatform
      * - get connect to resource
      *
      * @param iConnection $connection
+     * @param iApiMethod|null  $method
      *
      * @throws \Exception
-     * @return void
+     * @return iConnection
      */
-    function prepareConnection(iConnection $connection)
+    function prepareConnection(iConnection $connection, $method = null)
     {
         // TODO: Implement prepareConnection() method.
     }
