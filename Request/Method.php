@@ -4,6 +4,13 @@ namespace Poirot\ApiClient\Request;
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\Core\BuilderSetterTrait;
 
+/**
+ * TODO define parameters name for method
+ *      it can be used as notation docblock
+ *      or used as setter method
+ *
+ *     ($country, $offset, $limit)
+ */
 class Method implements iApiMethod
 {
     use BuilderSetterTrait;
