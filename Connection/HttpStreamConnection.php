@@ -59,7 +59,7 @@ class HttpStreamConnection extends AbstractConnection
         (isset($parsedServerUrl['port'])) ?: $parsedServerUrl['port'] = 80;
         $serverUrl = $this->__unparse_url($parsedServerUrl);
 
-        $stream = new StreamClient($serverUrl);
+        $stream = new StreamClient($serverUrl, $this->inOptions()->getContext());
 
         ### options
         $stream->setTimeout($this->inOptions()->getTimeout());
