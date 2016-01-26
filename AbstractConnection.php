@@ -39,7 +39,7 @@ abstract class AbstractConnection implements iConnection
      * - prepare resource with options
      *
      * @throws ConnectException
-     * @return void
+     * @return mixed Connection Resource
      */
     abstract function getConnect();
 

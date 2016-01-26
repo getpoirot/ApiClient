@@ -19,7 +19,7 @@ interface iConnection extends iOptionsProvider
      * - prepare resource with options
      *
      * @throws ConnectException
-     * @return void
+     * @return mixed Connection Resource
      */
     function getConnect();
 
