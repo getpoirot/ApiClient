@@ -4,7 +4,6 @@ namespace Poirot\ApiClient\Connection;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\Interfaces\iDataSetConveyor;
 use Poirot\Logger\Context\AbstractContext;
-use Poirot\Stream\Context\BaseContext;
 use Poirot\Stream\Context\Http\HttpContext;
 use Poirot\Stream\Context\Http\HttpsContext;
 use Poirot\Stream\Context\Socket\SocketContext;
