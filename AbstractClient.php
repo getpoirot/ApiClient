@@ -2,6 +2,7 @@
 namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Interfaces\iClient;
+use Poirot\ApiClient\Interfaces\iConnection;
 use Poirot\ApiClient\Interfaces\iPlatform;
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
@@ -9,6 +10,15 @@ use Poirot\ApiClient\Request\Method;
 
 abstract class AbstractClient implements iClient
 {
+    ## in case of using magic get method
+    ## it's better that classes that extend
+    ## this AbstractClient use same platform
+    ## and connection class property
+    /** @var iPlatform */
+    protected $platform;
+    /** @var iConnection */
+    protected $connection;
+
     /**
      * we keep instance of last method called in our
      * client Object
@@ -17,41 +27,16 @@ abstract class AbstractClient implements iClient
      */
     protected $method;
 
-    /**
-     * Call a method in this namespace.
-     *
-     * @param string $methodName
-     * @param array  $args
-     *
-     * @return iResponse
-     */
-    function __call($methodName, $args)
-    {
-        if(!$this->method) {
-            $method = new Method;
-            $method->setMethod($methodName);
-            $method->setArguments($args);
-            $this->method = $method;
-        }
-
-        return $this->call($this->method);
-    }
-
 
     /**
-     * __get
-     * proxy function to Method class __get
-     * Get to next successive namespace
+     * Get Client Platform
      *
-     * @param string $namespace
+     * - used by request to build params for
+     *   server execution call and response
      *
-     * @return $this
+     * @return iPlatform
      */
-    function __get($namespace)
-    {
-        return $this->method->__get($namespace);
-    }
-
+    abstract function platform();
 
     /**
      * Execute Request
@@ -84,13 +69,47 @@ abstract class AbstractClient implements iClient
         return $response;
     }
 
+
+    // ...
+
     /**
-     * Get Client Platform
+     * Call a method in this namespace.
      *
-     * - used by request to build params for
-     *   server execution call and response
+     * @param string $methodName
+     * @param array  $args
      *
-     * @return iPlatform
+     * @return iResponse
      */
-    abstract function platform();
+    function __call($methodName, $args)
+    {
+        $method = $this->__method();
+        $method->setMethod($methodName);
+        $method->setArguments($args);
+
+        $this->method = $method;
+        return $this->call($this->method);
+    }
+
+
+    /**
+     * __get
+     * proxy function to Method class __get
+     * Get to next successive namespace
+     *
+     * @param string $namespace
+     *
+     * @return $this
+     */
+    function __get($namespace)
+    {
+        return $this->__method()->__get($namespace);
+    }
+
+    function __method()
+    {
+        if(!$this->method)
+            $this->method = new Method;
+
+        return $this->method;
+    }
 }
