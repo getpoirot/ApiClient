@@ -202,11 +202,7 @@ class HttpStreamConnection extends AbstractConnection
                 $break = true;
             }
 
-            if ($break) {
-                ## shift it
-                $stream->read(strlen("\r\n"));
-                break;
-            }
+            if ($break) break;
         }
 
         if (empty($headers))
@@ -220,7 +216,6 @@ class HttpStreamConnection extends AbstractConnection
             $this->_getBufferStream()->write($body);
             $this->_buffer_seek += $this->_getBufferStream()->getTransCount();
         }
-
 
         return (object) ['header' => $headers, 'body' => $this->_getBufferStream()->seek($curSeek)];
     }
