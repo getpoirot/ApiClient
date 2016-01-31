@@ -2,7 +2,7 @@
 namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Interfaces\iClient;
-use Poirot\ApiClient\Interfaces\iConnection;
+use Poirot\ApiClient\Interfaces\iTransporter;
 use Poirot\ApiClient\Interfaces\iPlatform;
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
@@ -13,11 +13,11 @@ abstract class AbstractClient implements iClient
     ## in case of using magic get method
     ## it's better that classes that extend
     ## this AbstractClient use same platform
-    ## and connection class property
+    ## and Transporter class property
     /** @var iPlatform */
     protected $platform;
-    /** @var iConnection */
-    protected $connection;
+    /** @var iTransporter */
+    protected $Transporter;
 
     /**
      * we keep instance of last method called in our
@@ -41,9 +41,9 @@ abstract class AbstractClient implements iClient
     /**
      * Execute Request
      *
-     * - prepare/validate connection with platform
+     * - prepare/validate Transporter with platform
      * - build expression via method/params with platform
-     * - send expression as request with connection
+     * - send expression as request with Transporter
      *    . build response with platform
      * - return response
      *
@@ -59,11 +59,11 @@ abstract class AbstractClient implements iClient
     {
         $platform = $this->platform();
 
-        $connection = clone $this->connection();
-        $connection = $platform->prepareConnection($connection, $method);
+        $transporter = clone $this->transporter();
+        $transporter = $platform->prepareTransporter($transporter, $method);
 
         $response = $platform->makeResponse(
-            $connection->send($platform->makeExpression($method))
+            $transporter->send($platform->makeExpression($method))
         );
 
         return $response;

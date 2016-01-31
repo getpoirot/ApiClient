@@ -1,14 +1,14 @@
 <?php
-namespace Poirot\ApiClient\Connection;
+namespace Poirot\ApiClient\Transporter;
 
-use Poirot\ApiClient\AbstractConnection;
+use Poirot\ApiClient\AbstractTransporter;
 use Poirot\ApiClient\Exception\ApiCallException;
 use Poirot\Core\Traits\CloneTrait;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\StreamClient;
 
-class HttpStreamConnection extends AbstractConnection
+class HttpStreamConnection extends AbstractTransporter
 {
     use CloneTrait;
 
@@ -31,17 +31,17 @@ class HttpStreamConnection extends AbstractConnection
     protected $_buffer_seek = 0; # current buffer write position
 
     /**
-     * Get Prepared Resource Connection
+     * Get Prepared Resource Transporter
      *
      * - prepare resource with options
      *
      * @throws \Exception
-     * @return mixed Connection Resource
+     * @return mixed Transporter Resource
      */
     function getConnect()
     {
         if ($this->isConnected())
-            ## close current connection if connected
+            ## close current transporter if connected
             $this->close();
 
 
@@ -96,9 +96,9 @@ class HttpStreamConnection extends AbstractConnection
     /**
      * Send Expression To Server
      *
-     * - send expression to server through connection
+     * - send expression to server through transporter
      *   resource
-     * - get connect if connection not stablished yet
+     * - get connect if transporter not stablished yet
      *
      * @param string|iStreamable $expr Expression
      *
@@ -172,7 +172,7 @@ class HttpStreamConnection extends AbstractConnection
      * - return null if request not sent or complete
      * - it must always return raw response body from server
      *
-     * @throws \Exception No Connection established
+     * @throws \Exception No Transporter established
      * @return null|string|Streamable
      */
     function receive()
@@ -231,7 +231,7 @@ class HttpStreamConnection extends AbstractConnection
         }
 
     /**
-     * Is Connection Resource Available?
+     * Is Transporter Resource Available?
      *
      * @return bool
      */
@@ -241,7 +241,7 @@ class HttpStreamConnection extends AbstractConnection
     }
 
     /**
-     * Close Connection
+     * Close Transporter
      * @return void
      */
     function close()

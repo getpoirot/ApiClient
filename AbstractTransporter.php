@@ -3,7 +3,7 @@ namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Exception\ApiCallException;
 use Poirot\ApiClient\Exception\ConnectException;
-use Poirot\ApiClient\Interfaces\iConnection;
+use Poirot\ApiClient\Interfaces\iTransporter;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\Interfaces\iDataSetConveyor;
 use Poirot\Core\Interfaces\iPoirotOptions;
@@ -11,7 +11,7 @@ use Poirot\Core\OpenOptions;
 use Poirot\Core\Traits\CloneTrait;
 use Poirot\Stream\Streamable;
 
-abstract class AbstractConnection implements iConnection
+abstract class AbstractTransporter implements iTransporter
 {
     use CloneTrait;
 
@@ -21,9 +21,9 @@ abstract class AbstractConnection implements iConnection
     /**
      * Construct
      *
-     * - pass connection options on construct
+     * - pass transporter options on construct
      *
-     * @param Array|iDataSetConveyor $options Connection Options
+     * @param array|iDataSetConveyor $options Transporter Options
      */
     function __construct($options = null)
     {
@@ -34,21 +34,21 @@ abstract class AbstractConnection implements iConnection
     }
 
     /**
-     * Get Prepared Resource Connection
+     * Get Prepared Resource Transporter
      *
      * - prepare resource with options
      *
      * @throws ConnectException
-     * @return mixed Connection Resource
+     * @return mixed Transporter Resource
      */
     abstract function getConnect();
 
     /**
      * Send Expression To Server
      *
-     * - send expression to server through connection
+     * - send expression to server through transporter
      *   resource
-     * - get connect if connection not stablished yet
+     * - get connect if transporter not stablished yet
      *
      * @param mixed $expr Expression
      *
@@ -64,20 +64,20 @@ abstract class AbstractConnection implements iConnection
      *   by send expression
      * - return null if request not sent
      *
-     * @throws \Exception No Connection established
+     * @throws \Exception No Transporter established
      * @return null|string|Streamable
      */
     abstract function receive();
 
     /**
-     * Is Connection Resource Available?
+     * Is Transporter Resource Available?
      *
      * @return bool
      */
     abstract function isConnected();
 
     /**
-     * Close Connection
+     * Close Transporter
      * @return void
      */
     abstract function close();

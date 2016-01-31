@@ -7,23 +7,23 @@ use Poirot\ApiClient\Interfaces\Response\iResponse;
 interface iPlatform
 {
     /**
-     * Prepare Connection To Make Call
+     * Prepare Transporter To Make Call
      *
-     * - validate connection
-     * - manipulate header or something in connection
+     * - validate transporter
+     * - manipulate header or something in transporter
      * - get connect to resource
      *
-     * @param iConnection      $connection
+     * @param iTransporter      $transporter
      * @param iApiMethod|null  $method
      *
      * @throws \Exception
-     * @return iConnection
+     * @return iTransporter
      */
-    function prepareConnection(iConnection $connection, $method = null);
+    function prepareTransporter(iTransporter $transporter, $method = null);
 
     /**
      * Build Platform Specific Expression To Send
-     * Trough Connection
+     * Trough Transporter
      *
      * @param iApiMethod $method Method Interface
      *

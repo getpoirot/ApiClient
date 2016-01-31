@@ -11,24 +11,24 @@ use Poirot\Stream\Streamable;
  * - Make Request To Server With Specific Expression
  * - Get Response Message From Server
  */
-interface iConnection extends iOptionsProvider
+interface iTransporter extends iOptionsProvider
 {
     /**
-     * Get Prepared Resource Connection
+     * Get Prepared Resource Transporter
      *
      * - prepare resource with options
      *
      * @throws ConnectException
-     * @return mixed Connection Resource
+     * @return mixed Transporter Resource
      */
     function getConnect();
 
     /**
      * Send Expression To Server
      *
-     * - send expression to server through connection
+     * - send expression to server through transporter
      *   resource
-     * - get connect if connection not stablished yet
+     * - get connect if transporter not stablished yet
      *
      * @param mixed $expr Expression
      *
@@ -44,20 +44,20 @@ interface iConnection extends iOptionsProvider
      *   by send expression
      * - return null if request not sent
      *
-     * @throws \Exception No Connection established
+     * @throws \Exception No Transporter established
      * @return null|string|Streamable
      */
     function receive();
 
     /**
-     * Is Connection Resource Available?
+     * Is Transporter Resource Available?
      *
      * @return bool
      */
     function isConnected();
 
     /**
-     * Close Connection
+     * Close Transporter
      * @return void
      */
     function close();

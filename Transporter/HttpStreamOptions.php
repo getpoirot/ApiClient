@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\ApiClient\Connection;
+namespace Poirot\ApiClient\Transporter;
 
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\Interfaces\iDataSetConveyor;

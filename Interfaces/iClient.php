@@ -7,18 +7,18 @@ use Poirot\ApiClient\Interfaces\Response\iResponse;
 interface iClient
 {
     /**
-     * Get Connection Adapter
+     * Get Transporter Adapter
      *
-     * @return iConnection
+     * @return iTransporter
      */
-    function connection();
+    function transporter();
 
     /**
      * Execute Request
      *
-     * - prepare/validate connection with platform
+     * - prepare/validate transporter with platform
      * - build expression via method/params with platform
-     * - send expression as request with connection
+     * - send expression as request with transporter
      *    . build response with platform
      * - return response
      *
