@@ -202,7 +202,11 @@ class HttpStreamConnection extends AbstractConnection
                 $break = true;
             }
 
-            if ($break) break;
+            if ($break) {
+                ## shift it
+                $stream->read(strlen("\r\n"));
+                break;
+            }
         }
 
         if (empty($headers))
