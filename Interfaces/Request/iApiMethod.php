@@ -1,5 +1,6 @@
 <?php
 namespace Poirot\ApiClient\Interfaces\Request;
+
 use Poirot\Core\Interfaces\iDataSetConveyor;
 
 /**
