@@ -4,7 +4,6 @@ namespace Poirot\ApiClient\Connection;
 use Poirot\ApiClient\AbstractConnection;
 use Poirot\ApiClient\Exception\ApiCallException;
 use Poirot\Core\Traits\CloneTrait;
-use Poirot\HttpAgent\Browser;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\StreamClient;
@@ -23,7 +22,7 @@ class HttpStreamConnection extends AbstractConnection
     protected $connected_options;
 
     /** @var bool  */
-    protected $isRequestComplete = false;
+    protected $lastReceive = false;
 
     /**
      * Write Received Server Data To It Until Complete
@@ -109,7 +108,7 @@ class HttpStreamConnection extends AbstractConnection
     function send($expr)
     {
         # prepare new request
-        $this->isRequestComplete = false;
+        $this->lastReceive = null;
 
         ## destruct buffer
         $this->_getBufferStream()->getResource()->close();
@@ -142,7 +141,7 @@ class HttpStreamConnection extends AbstractConnection
             ), 0, 1, __FILE__, __LINE__, $e);
         }
 
-        $this->isRequestComplete = true;
+        $this->lastReceive = $response;
         return $response;
     }
 
@@ -158,16 +157,9 @@ class HttpStreamConnection extends AbstractConnection
         {
             $expr->rewind()->pipeTo($this->streamable);
 
-            # receive response headers once request sent
-            $responseHeader = $this->receive()->read();
-
-            if (!$responseHeader)
-                throw new \Exception('Server not respond to this request.');
-
             # receive rest response body
-            $responseBody = $this->receive()->read();
-
-            return (object) ['header' => $responseHeader, 'body' => $responseBody];
+            $response = $this->receive();
+            return $response;
         }
 
     /**
@@ -185,8 +177,8 @@ class HttpStreamConnection extends AbstractConnection
      */
     function receive()
     {
-        if ($this->isRequestComplete)
-            return null;
+        if ($this->lastReceive)
+            return $this->lastReceive;
 
         ## so we can read later from latest position to end
         ## in example when we write header we can retrieve header next time
@@ -199,23 +191,34 @@ class HttpStreamConnection extends AbstractConnection
                 "Read timed out after {$this->inOptions()->getTimeout()} seconds."
             );
 
+        # read headers:
+
+        $headers = '';
         while(!$stream->isEOF() && ($line = $stream->readLine("\r\n")) !== null ) {
             $break = false;
-            $response = $line."\r\n";
+            $headers .= $line."\r\n";
             if (trim($line) === '') {
                 ## http headers part read complete
-                $response .= "\r\n";
                 $break = true;
             }
-
-            $this->_getBufferStream()->seek($this->_buffer_seek);
-            $this->_getBufferStream()->write($response);
-            $this->_buffer_seek += $this->_getBufferStream()->getTransCount();
 
             if ($break) break;
         }
 
-        return $this->_getBufferStream()->seek($curSeek);
+        if (empty($headers))
+            throw new \Exception('Server not respond to this request.');
+
+        $body = '';
+        while(!$stream->isEOF()) {
+            $body .= $stream->read(1024);
+
+            $this->_getBufferStream()->seek($this->_buffer_seek);
+            $this->_getBufferStream()->write($body);
+            $this->_buffer_seek += $this->_getBufferStream()->getTransCount();
+        }
+
+
+        return (object) ['header' => $headers, 'body' => $this->_getBufferStream()->seek($curSeek)];
     }
 
         protected function _getBufferStream()
