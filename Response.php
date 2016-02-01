@@ -4,6 +4,7 @@ namespace Poirot\ApiClient;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 use Poirot\Core\BuilderSetterTrait;
 use Poirot\Core\Entity;
+use Poirot\Core\Interfaces\iDataSetConveyor;
 
 class Response implements iResponse
 {
@@ -11,12 +12,15 @@ class Response implements iResponse
 
     /** @var Entity */
     protected $meta;
-
     /** @var string Origin Response Body */
-    protected $origin;
+    protected $rawbody;
+
+    /** @var callable */
+    protected $defaultExpected;
 
     /** @var \Exception Exception */
     protected $exception = null;
+
 
     /**
      * Construct
@@ -43,6 +47,17 @@ class Response implements iResponse
     }
 
     /**
+     * Setter Helper For Meta Data
+     * @param array|iDataSetConveyor $dataSet
+     * @return $this
+     */
+    function setMeta($dataSet)
+    {
+        $this->meta()->from($dataSet);
+        return $this;
+    }
+
+    /**
      * Set Response Origin Content
      *
      * @param string $content Content Body
@@ -51,7 +66,7 @@ class Response implements iResponse
      */
     function setRawBody($content)
     {
-        $this->origin = $content;
+        $this->rawbody = $content;
 
         return $this;
     }
@@ -63,7 +78,7 @@ class Response implements iResponse
      */
     function getRawBody()
     {
-        return $this->origin;
+        return $this->rawbody;
     }
 
     /**
@@ -90,6 +105,22 @@ class Response implements iResponse
     }
 
     /**
+     * Default Processor of Expected Result
+     *
+     * :proc
+     * mixed function($originResult);
+     *
+     * @param callable $proc
+     *
+     * @return $this
+     */
+    function setDefaultExpected(callable $proc)
+    {
+        $this->defaultExpected = $proc;
+        return $this;
+    }
+
+    /**
      * Process Raw Body As Result
      *
      * :proc
@@ -101,9 +132,11 @@ class Response implements iResponse
      */
     function expected(callable $proc = null)
     {
+        (!$this->defaultExpected && $proc === null) ?: $proc = $this->defaultExpected;
+
         if ($proc !== null)
-            return call_user_func($proc, $this->origin);
-        else
-            return $this->origin;
+            return call_user_func($proc, $this->rawbody);
+
+        return $this->rawbody;
     }
 }
