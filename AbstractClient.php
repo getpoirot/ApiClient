@@ -17,7 +17,7 @@ abstract class AbstractClient implements iClient
     /** @var iPlatform */
     protected $platform;
     /** @var iTransporter */
-    protected $Transporter;
+    protected $transporter;
 
     /**
      * we keep instance of last method called in our
