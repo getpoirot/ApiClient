@@ -80,9 +80,12 @@ class HttpSocketConnection extends AbstractTransporter
         (isset($parsedServerUrl['port'])) ?: $parsedServerUrl['port'] = 80;
         $serverUrl = $this->__unparse_url($parsedServerUrl);
 
-        $stream = new StreamClient([
-            'socket_uri' => $serverUrl,
-        ], $this->inOptions()->getContext());
+        $stream = new StreamClient(
+            \Poirot\Core\array_merge(
+                $this->inOptions()->toArray()
+                , ['socket_uri' => $serverUrl]
+            )
+        );
 
         ### options
         $stream->setTimeout($this->inOptions()->getTimeout());
