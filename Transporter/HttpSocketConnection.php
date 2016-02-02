@@ -116,6 +116,8 @@ class HttpSocketConnection extends AbstractTransporter
         }
 
     /**
+     * TODO make request and response are too slow
+     *
      * Send Expression To Server
      *
      * - send expression to server through transporter
@@ -129,6 +131,8 @@ class HttpSocketConnection extends AbstractTransporter
      */
     function send($expr)
     {
+//        $start = microtime(true);
+
         # prepare new request
         $this->lastReceive = null;
 
@@ -162,6 +166,8 @@ class HttpSocketConnection extends AbstractTransporter
                 , $this->streamable->getResource()->getRemoteName()
             ), 0, 1, __FILE__, __LINE__, $e);
         }
+
+//        printf("get connect: %f<br/>", microtime(true) - $start);
 
         $this->lastReceive = $response;
         return $response;
