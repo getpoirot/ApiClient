@@ -8,6 +8,28 @@ use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\StreamClient;
 
+/*
+$httpRequest = new HttpRequest([
+    'uri' => '/payam/',
+    'headers' => [
+        'Host'            => '95.211.189.240',
+        'Accept-Encoding' => 'gzip',
+        'Cache-Control'   => 'no-cache',
+    ]
+]);
+
+$stream = new HttpSocketConnection(['server_url' => 'http://95.211.189.240/']);
+$startTime = microtime(true);
+$res = $stream->send($httpRequest->toString());
+printf("HttpSocket: %f<br/>", microtime(true) - $startTime);
+
+$body = $res->body;
+$body->getResource()->appendFilter(new PhpRegisteredFilter('zlib.inflate'), STREAM_FILTER_READ);
+### skip the first 10 bytes for zlib
+$body = new SegmentWrapStream($body, -1, 10);
+echo $body->read();
+*/
+
 class HttpSocketConnection extends AbstractTransporter
 {
     use CloneTrait;
