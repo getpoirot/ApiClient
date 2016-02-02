@@ -8,7 +8,7 @@ use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\StreamClient;
 
-class HttpStreamConnection extends AbstractTransporter
+class HttpSocketConnection extends AbstractTransporter
 {
     use CloneTrait;
 
@@ -17,7 +17,7 @@ class HttpStreamConnection extends AbstractTransporter
 
     /**
      * the options will not changed when connected
-     * @var HttpStreamOptions
+     * @var HttpSocketOptions
      */
     protected $connected_options;
 
@@ -258,7 +258,7 @@ class HttpStreamConnection extends AbstractTransporter
 
     /**
      * @override just for ide completion
-     * @return HttpStreamOptions
+     * @return HttpSocketOptions
      */
     function inOptions()
     {
@@ -271,10 +271,10 @@ class HttpStreamConnection extends AbstractTransporter
 
     /**
      * @override
-     * @return HttpStreamOptions
+     * @return HttpSocketOptions
      */
     static function newOptions()
     {
-        return new HttpStreamOptions;
+        return new HttpSocketOptions;
     }
 }

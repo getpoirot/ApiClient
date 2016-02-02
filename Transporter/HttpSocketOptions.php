@@ -8,7 +8,7 @@ use Poirot\Stream\Context\Http\HttpContext;
 use Poirot\Stream\Context\Http\HttpsContext;
 use Poirot\Stream\Context\Socket\SocketContext;
 
-class HttpStreamOptions extends AbstractOptions
+class HttpSocketOptions extends AbstractOptions
 {
     protected $serverUrl;
 
