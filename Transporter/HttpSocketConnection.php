@@ -80,11 +80,13 @@ class HttpSocketConnection extends AbstractTransporter
         (isset($parsedServerUrl['port'])) ?: $parsedServerUrl['port'] = 80;
         $serverUrl = $this->__unparse_url($parsedServerUrl);
 
-        $stream = new StreamClient($serverUrl, $this->inOptions()->getContext());
+        $stream = new StreamClient([
+            'socket_uri' => $serverUrl,
+        ], $this->inOptions()->getContext());
 
         ### options
         $stream->setTimeout($this->inOptions()->getTimeout());
-        $stream->setPersistent($this->inOptions()->getPersist());
+        $stream->setPersist($this->inOptions()->isPersist());
 
         try{
             $resource = $stream->getConnect();

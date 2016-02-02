@@ -7,15 +7,16 @@ use Poirot\Logger\Context\AbstractContext;
 use Poirot\Stream\Context\Http\HttpContext;
 use Poirot\Stream\Context\Http\HttpsContext;
 use Poirot\Stream\Context\Socket\SocketContext;
+use Poirot\Stream\StreamClientOptionsTrait;
 
 class HttpSocketOptions extends AbstractOptions
 {
-    protected $serverUrl;
+    use StreamClientOptionsTrait {
+        StreamClientOptionsTrait::setSocketUri as protected __hide__setSocketUri;
+        StreamClientOptionsTrait::getSocketUri as protected __hide__getSocketUri;
+    }
 
-    protected $timeout = 20;
-    protected $persist = true;
-    /** @var AbstractContext */
-    protected $context;
+    protected $serverUrl;
 
     /**
      * Server Url That we Will Connect To
@@ -34,42 +35,6 @@ class HttpSocketOptions extends AbstractOptions
     public function getServerUrl()
     {
         return $this->serverUrl;
-    }
-
-    /**
-     * @param mixed $timeout
-     * @return $this
-     */
-    public function setTimeout($timeout)
-    {
-        $this->timeout = (int) $timeout;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getTimeout()
-    {
-        return $this->timeout;
-    }
-
-    /**
-     * @param mixed $persist
-     * @return $this
-     */
-    public function setPersist($persist = true)
-    {
-        $this->persist = (bool) $persist;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPersist()
-    {
-        return $this->persist;
     }
 
     /**
