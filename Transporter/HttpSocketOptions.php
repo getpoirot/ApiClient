@@ -14,6 +14,8 @@ class HttpSocketOptions extends AbstractOptions
     use StreamClientOptionsTrait {
         StreamClientOptionsTrait::setSocketUri as protected __hide__setSocketUri;
         StreamClientOptionsTrait::getSocketUri as protected __hide__getSocketUri;
+        StreamClientOptionsTrait::setNoneBlocking as protected __hide__setNoneBlocking;
+        StreamClientOptionsTrait::isNoneBlocking as protected __hide__isNoneBlocking;
     }
 
     protected $serverUrl;
