@@ -53,6 +53,8 @@ class HttpSocketConnection extends AbstractTransporter
     protected $_buffer_seek = 0; # current buffer write position
 
     /**
+     * TODO ssl connection
+     *
      * Get Prepared Resource Transporter
      *
      * - prepare resource with options
@@ -68,10 +70,12 @@ class HttpSocketConnection extends AbstractTransporter
 
 
         # apply options to resource
+
         ## options will not take an affect after connect
         $this->connected_options = clone $this->inOptions();
 
         ## determine protocol
+
         if (!$serverUrl = $this->inOptions()->getServerUrl())
             throw new \RuntimeException('Server Url is Mandatory For Connect.');
 
