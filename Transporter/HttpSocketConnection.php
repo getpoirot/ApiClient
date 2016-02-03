@@ -3,6 +3,7 @@ namespace Poirot\ApiClient\Transporter;
 
 use Poirot\ApiClient\AbstractTransporter;
 use Poirot\ApiClient\Exception\ApiCallException;
+use Poirot\Core\OpenCall;
 use Poirot\Core\Traits\CloneTrait;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Streamable;
@@ -50,7 +51,82 @@ class HttpSocketConnection extends AbstractTransporter
      * Write Received Server Data To It Until Complete
      * @var Streamable\TemporaryStream */
     protected $_buffer;
-    protected $_buffer_seek = 0; # current buffer write position
+    protected $_buffer_seek = 0;
+
+    # events
+    protected $_on__request_send_prepare;
+    protected $_on__response_header_received;
+    protected $_on__response_received;
+
+    /** @var \StdClass (object) ['headers'=> .., 'body'=>stream_offset] latest request expression to receive on events */
+    protected $_tmp_expr;
+
+
+    // Events:
+
+    /**
+     * Prepare Expression Before Send
+     *
+     * - the closure functions will bind to this object
+     *
+     * closure:
+     * mixed function($expression) {
+     *   // $this will point to HttpSocketConnection (current-class)
+     * }
+     *
+     *
+     * @return OpenCall
+     */
+    function onRequestSendPrepare()
+    {
+        if (!$this->_on__request_send_prepare)
+            $this->_on__request_send_prepare = new OpenCall($this);
+
+        return $this->_on__request_send_prepare;
+    }
+
+    /**
+     * Header Response Received
+     *
+     * - the closure functions will bind to this object
+     *
+     * closure:
+     * $continue (object) ['isDone' => false] ## is done true cause not given body part
+     * mixed function($headers, $expression, $continue) {
+     *   // $this will point to HttpSocketConnection (current-class)
+     * }
+     *
+     *
+     * @return OpenCall
+     */
+    function onResponseHeaderReceived()
+    {
+        if (!$this->_on__response_header_received)
+            $this->_on__response_header_received = new OpenCall($this);
+
+        return $this->_on__response_header_received;
+    }
+
+    /**
+     * Response Fully Received
+     *
+     * - the closure functions will bind to this object
+     *
+     * closure:
+     * mixed function($headers, $body, $expression) {
+     *   // $this will point to HttpSocketConnection (current-class)
+     * }
+     *
+     *
+     * @return OpenCall
+     */
+    function onResponseReceived()
+    {
+        if (!$this->_on__response_received)
+            $this->_on__response_received = new OpenCall($this);
+
+        return $this->_on__response_received;
+    }
 
     /**
      * TODO ssl connection
@@ -150,25 +226,21 @@ class HttpSocketConnection extends AbstractTransporter
         $this->_buffer = null;
 
         # get connect if not
-        if (!$this->isConnected())
+        if (
+            !$this->isConnected()
+            || !$this->streamable->getResource()->isAlive()
+        )
             $this->getConnect();
 
-
-        $expr = (!is_string($expr)) ? (string) $expr : $expr;
-
-        if (is_string($expr))
-            $expr = new Streamable\TemporaryStream($expr);
-
-        if (!$expr instanceof iStreamable)
-            throw new \InvalidArgumentException(sprintf(
-                'Http Expression must instance of iHttpRequest, RequestInterface or string. given: "%s".'
-                , \Poirot\Core\flatten($expr)
-            ));
 
         # write stream
         try
         {
-            $response = $this->__handleRequest($expr);
+            // Fire up registered methods to prepare expression
+            foreach($this->onRequestSendPrepare()->listMethods() as $method)
+                $expr = call_user_func([$this->onRequestSendPrepare(), $method], $expr);
+
+            $response = $this->doHandleRequest($expr);
         } catch (\Exception $e) {
             throw new ApiCallException(sprintf(
                 'Request Call Error When Send To Server (%s)'
@@ -183,16 +255,33 @@ class HttpSocketConnection extends AbstractTransporter
     }
 
         /**
-         * Send Request To Server
+         * Send Request To Server And Receive Response
          *
-         * @param iStreamable $expr
+         * @param iStreamable|string|mixed $expr
          *
          * @throws \Exception
          * @return string
          */
-        protected function __handleRequest(iStreamable $expr)
+        protected function doHandleRequest($expr)
         {
-            $expr->rewind()->pipeTo($this->streamable);
+            if (is_object($expr) && !$expr instanceof iStreamable)
+                $expr = (string) $expr;
+
+            if (is_string($expr))
+                $expr = (new Streamable\TemporaryStream($expr))->rewind();
+
+            if (!$expr instanceof iStreamable)
+                throw new \InvalidArgumentException(sprintf(
+                    'Http Expression must instance of iHttpRequest, RequestInterface or string. given: "%s".'
+                    , \Poirot\Core\flatten($expr)
+                ));
+
+            # send request
+            $headers = $this->__readHeadersFromStream($expr);
+            $this->_tmp_expr = (object) ['headers' => $headers, 'body'=> $expr->getCurrOffset()];
+
+            $this->streamable->write($headers);
+            $expr->pipeTo($this->streamable);
 
             # receive rest response body
             $response = $this->receive();
@@ -229,23 +318,24 @@ class HttpSocketConnection extends AbstractTransporter
             );
 
         # read headers:
-
-        $headers = '';
-        while(!$stream->isEOF() && ($line = $stream->readLine("\r\n")) !== null ) {
-            $break = false;
-            $headers .= $line."\r\n";
-            if (trim($line) === '') {
-                ## http headers part read complete
-                $break = true;
-            }
-
-            if ($break) break;
-        }
+        $headers = $this->__readHeadersFromStream($stream);
 
         if (empty($headers))
             throw new \Exception('Server not respond to this request.');
 
-        $body = '';
+        // Fire up registered methods to prepare expression
+        $response = $headers;
+        $body     = null;
+
+        $continue = (object) ['isDone' => false];
+        foreach($this->onResponseHeaderReceived()->listMethods() as $method)
+            $response = call_user_func([$this->onResponseHeaderReceived(), $method], $response, $this->_tmp_expr, $continue);
+
+        if ($continue->isDone)
+            // terminate and return response
+            goto finalize;
+
+        # read body:
         while(!$stream->isEOF()) {
             $body .= $stream->read(1024);
 
@@ -253,9 +343,32 @@ class HttpSocketConnection extends AbstractTransporter
             $this->_getBufferStream()->write($body);
             $this->_buffer_seek += $this->_getBufferStream()->getTransCount();
         }
+        $body = $this->_getBufferStream()->seek($curSeek);
 
-        return (object) ['header' => $headers, 'body' => $this->_getBufferStream()->seek($curSeek)];
+finalize:
+
+        foreach($this->onResponseReceived()->listMethods() as $method)
+            $response = call_user_func([$this->onResponseReceived(), $method], $response, $body, $this->_tmp_expr);
+
+        return $response;
     }
+
+        protected function __readHeadersFromStream(iStreamable $stream)
+        {
+            $headers = '';
+            while(!$stream->isEOF() && ($line = $stream->readLine("\r\n")) !== null ) {
+                $break = false;
+                $headers .= $line."\r\n";
+                if (trim($line) === '') {
+                    ## http headers part read complete
+                    $break = true;
+                }
+
+                if ($break) break;
+            }
+
+            return $headers;
+        }
 
         protected function _getBufferStream()
         {
