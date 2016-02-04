@@ -132,7 +132,7 @@ class Response implements iResponse
      */
     function expected(callable $proc = null)
     {
-        (!$this->defaultExpected && $proc === null) ?: $proc = $this->defaultExpected;
+        ($proc !== null) ?: $proc = $this->defaultExpected;
 
         if ($proc !== null)
             return call_user_func($proc, $this->rawbody);
