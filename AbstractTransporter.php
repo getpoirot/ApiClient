@@ -48,11 +48,12 @@ abstract class AbstractTransporter implements iTransporter
      *
      * - send expression to server through transporter
      *   resource
-     * - get connect if transporter not stablished yet
+     *
+     * !! it must be connected
      *
      * @param mixed $expr Expression
      *
-     * @throws ApiCallException
+     * @throws ApiCallException|ConnectException
      * @return mixed Prepared Server Response
      */
     abstract function send($expr);
@@ -107,10 +108,12 @@ abstract class AbstractTransporter implements iTransporter
      *      $class = new Filesystem($opt);
      *   [/php]
      *
+     * @param null|mixed $builder Builder Options as Constructor
+     *
      * @return AbstractOptions
      */
-    static function newOptions()
+    static function newOptions($builder = null)
     {
-        return new OpenOptions;
+        return new OpenOptions($builder);
     }
 }

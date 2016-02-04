@@ -18,7 +18,7 @@ class HttpSocketOptions extends AbstractOptions
         StreamClientOptionsTrait::isNoneBlocking as protected __hide__isNoneBlocking;
     }
 
-    protected $serverUrl;
+    protected $serverUrl = VOID;
 
     /**
      * Server Url That we Will Connect To
@@ -40,7 +40,17 @@ class HttpSocketOptions extends AbstractOptions
     }
 
     /**
-     * @return AbstractContext
+     * @param array|iDataSetConveyor|AbstractContext $context
+     * @return $this
+     */
+    public function setContext($context)
+    {
+        $this->getContext()->from($context);
+        return $this;
+    }
+
+    /**
+     * @return SocketContext
      */
     public function getContext()
     {
@@ -51,15 +61,5 @@ class HttpSocketOptions extends AbstractOptions
         }
 
         return $this->context;
-    }
-
-    /**
-     * @param array|iDataSetConveyor|AbstractContext $context
-     * @return $this
-     */
-    public function setContext($context)
-    {
-        $this->getContext()->from($context);
-        return $this;
     }
 }
