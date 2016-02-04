@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\ApiClient;
 
+use Poirot\ApiClient\Exception\ConnectException;
 use Poirot\ApiClient\Interfaces\iClient;
 use Poirot\ApiClient\Interfaces\iTransporter;
 use Poirot\ApiClient\Interfaces\iPlatform;
@@ -62,8 +63,19 @@ abstract class AbstractClient implements iClient
         $transporter = clone $this->transporter();
         $transporter = $platform->prepareTransporter($transporter, $method);
 
+        $expression = $platform->makeExpression($method);
+
+        try {
+            if (!$transporter->isConnected())
+                $transporter->getConnect();
+        } catch (\Exception $e) {
+            throw new ConnectException(sprintf(
+                'Error While Connecting To Transporter'
+            ), $e->getCode(), $e);
+        }
+
         $response = $platform->makeResponse(
-            $transporter->send($platform->makeExpression($method))
+            $transporter->send($expression)
         );
 
         return $response;

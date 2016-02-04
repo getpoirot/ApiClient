@@ -3,6 +3,7 @@ namespace Poirot\ApiClient\Transporter;
 
 use Poirot\ApiClient\AbstractTransporter;
 use Poirot\ApiClient\Exception\ApiCallException;
+use Poirot\ApiClient\Exception\ConnectException;
 use Poirot\Core\OpenCall;
 use Poirot\Core\Traits\CloneTrait;
 use Poirot\Stream\Interfaces\iStreamable;
@@ -152,7 +153,9 @@ class HttpSocketConnection extends AbstractTransporter
 
         ## determine protocol
 
-        if (!$serverUrl = $this->inOptions()->getServerUrl())
+        $serverUrl = $this->inOptions()->getServerUrl();
+
+        if (!$serverUrl)
             throw new \RuntimeException('Server Url is Mandatory For Connect.');
 
         $parsedServerUrl = parse_url($serverUrl);
@@ -207,11 +210,12 @@ class HttpSocketConnection extends AbstractTransporter
      *
      * - send expression to server through transporter
      *   resource
-     * - get connect if transporter not stablished yet
+     *
+     * !! it must be connected
      *
      * @param string|iStreamable $expr Expression
      *
-     * @throws ApiCallException
+     * @throws ApiCallException|ConnectException
      * @return string Response
      */
     function send($expr)
@@ -226,11 +230,8 @@ class HttpSocketConnection extends AbstractTransporter
         $this->_buffer = null;
 
         # get connect if not
-        if (
-            !$this->isConnected()
-            || !$this->streamable->getResource()->isAlive()
-        )
-            $this->getConnect();
+        if (!$this->isConnected())
+            throw new ConnectException;
 
 
         # write stream
@@ -423,8 +424,8 @@ finalize:
      * @override
      * @return HttpSocketOptions
      */
-    static function newOptions()
+    static function newOptions($builder = null)
     {
-        return new HttpSocketOptions;
+        return new HttpSocketOptions($builder);
     }
 }
