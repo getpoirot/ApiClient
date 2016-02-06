@@ -36,6 +36,36 @@ class HttpSocketConnection extends AbstractTransporter
 {
     use CloneTrait;
 
+    /*
+     * closure:
+     * mixed function($expression) {
+     *   // $this will point to HttpSocketConnection (current-class)
+     * }
+     */
+    const EVENT_REQUEST_SEND_PREPARE       = 'request.send.prepare';
+    /*
+     * closure:
+     * $continue (object) ['isDone' => false] ## is done true cause not given body part
+     * mixed function($headers, $expression, $continue) {
+     *   // $this will point to HttpSocketConnection (current-class)
+     * }
+     */
+    const EVENT_RESPONSE_RECEIVED_HEADER   = 'response.received.header';
+    /*
+     * closure:
+     * mixed function($headers, $body, $expression) {
+     *   // $this will point to HttpSocketConnection (current-class)
+     * }
+     */
+    const EVENT_RESPONSE_RECEIVED_COMPLETE = 'response.received.complete';
+
+    protected $_events = [
+        self::EVENT_REQUEST_SEND_PREPARE       => /* OpenCall */ null,
+        self::EVENT_RESPONSE_RECEIVED_HEADER   => null,
+        self::EVENT_RESPONSE_RECEIVED_COMPLETE => null,
+        // ...
+    ];
+
     /** @var Streamable When Connected */
     protected $streamable;
 
@@ -54,11 +84,6 @@ class HttpSocketConnection extends AbstractTransporter
     protected $_buffer;
     protected $_buffer_seek = 0;
 
-    # events
-    protected $_on__request_send_prepare;
-    protected $_on__response_header_received;
-    protected $_on__response_received;
-
     /** @var \StdClass (object) ['headers'=> .., 'body'=>stream_offset] latest request expression to receive on events */
     protected $_tmp_expr;
 
@@ -66,67 +91,65 @@ class HttpSocketConnection extends AbstractTransporter
     // Events:
 
     /**
-     * Prepare Expression Before Send
+     * Add Listener To Specific Event
      *
-     * - the closure functions will bind to this object
+     * - if listener name not passed it must used default unique name
+     * - if listener name exists it will override by new one
      *
-     * closure:
-     * mixed function($expression) {
-     *   // $this will point to HttpSocketConnection (current-class)
-     * }
+     * @param string               $eventName
+     * @param null|string|\Closure $listener_closure
+     * @param \Closure|null        $closure
      *
-     *
-     * @return OpenCall
+     * @return $this
      */
-    function onRequestSendPrepare()
+    function onEvent($eventName, $listener_closure = null, \Closure $closure = null)
     {
-        if (!$this->_on__request_send_prepare)
-            $this->_on__request_send_prepare = new OpenCall($this);
+        if (!array_key_exists($eventName, $this->_events) || !$this->_events[$eventName] instanceof OpenCall)
+            $this->_events[$eventName] = (new OpenCall)->bindTo($this);
 
-        return $this->_on__request_send_prepare;
+        if ($listener_closure instanceof \Closure) {
+            // onEvent('event', function() ..)
+            $closure = $listener_closure;
+            $listener_closure = null;
+        }
+
+        /** @var OpenCall $e */
+        ($listener_closure !== null) ?: $listener_closure = uniqid();
+
+        $e = $this->_events[$eventName];
+        $e->addMethod($listener_closure, $closure);
+
+        return $this;
     }
 
     /**
-     * Header Response Received
+     * Trigger Event by Call Listeners Attached To That Event
      *
-     * - the closure functions will bind to this object
+     * - do nothing if event not registered
      *
-     * closure:
-     * $continue (object) ['isDone' => false] ## is done true cause not given body part
-     * mixed function($headers, $expression, $continue) {
-     *   // $this will point to HttpSocketConnection (current-class)
-     * }
+     * @param string $eventName
      *
+     * // triggerEvent($eventName, $arg1, $arg2, ...)
+     * @param null $arguments
+     * @param null $_
      *
-     * @return OpenCall
+     * @return VOID|mixed void if not any event registerd
      */
-    function onResponseHeaderReceived()
+    function triggerEvent($eventName, $arguments = null, $_ = null)
     {
-        if (!$this->_on__response_header_received)
-            $this->_on__response_header_received = new OpenCall($this);
+        if (!array_key_exists($eventName, $this->_events))
+            return $this;
 
-        return $this->_on__response_header_received;
-    }
+        $expr = null;
+        $args = func_get_args();
+        array_shift($args);
 
-    /**
-     * Response Fully Received
-     *
-     * - the closure functions will bind to this object
-     *
-     * closure:
-     * mixed function($headers, $body, $expression) {
-     *   // $this will point to HttpSocketConnection (current-class)
-     * }
-     *
-     *
-     * @return OpenCall
-     */
-    function onResponseReceived()
-    {
-        if (!$this->_on__response_received)
-            $this->_on__response_received = new OpenCall($this);
+        /** @var OpenCall $e */
+        $e    = $this->_events[$eventName];
+        foreach($e->listMethods() as $method)
+            $expr = call_user_func_array([$e, $method], $args);
 
-        return $this->_on__response_received;
+        return $expr;
     }
 
     /**
@@ -238,9 +261,7 @@ class HttpSocketConnection extends AbstractTransporter
         try
         {
             // Fire up registered methods to prepare expression
-            foreach($this->onRequestSendPrepare()->listMethods() as $method)
-                $expr = call_user_func([$this->onRequestSendPrepare(), $method], $expr);
-
+            $expr = $this->triggerEvent(self::EVENT_REQUEST_SEND_PREPARE, $expr);
             $response = $this->doHandleRequest($expr);
         } catch (\Exception $e) {
             throw new ApiCallException(sprintf(
@@ -329,8 +350,11 @@ class HttpSocketConnection extends AbstractTransporter
         $body     = null;
 
         $continue = (object) ['isDone' => false];
-        foreach($this->onResponseHeaderReceived()->listMethods() as $method)
-            $response = call_user_func([$this->onResponseHeaderReceived(), $method], $response, $this->_tmp_expr, $continue);
+        $response = $this->triggerEvent(self::EVENT_RESPONSE_RECEIVED_HEADER
+            , $response
+            , $this->_tmp_expr
+            , $continue
+        );
 
         if ($continue->isDone)
             // terminate and return response
@@ -348,8 +372,11 @@ class HttpSocketConnection extends AbstractTransporter
 
 finalize:
 
-        foreach($this->onResponseReceived()->listMethods() as $method)
-            $response = call_user_func([$this->onResponseReceived(), $method], $response, $body, $this->_tmp_expr);
+        $response = $this->triggerEvent(self::EVENT_RESPONSE_RECEIVED_COMPLETE
+            , $response
+            , $body
+            , $this->_tmp_expr
+        );
 
         return $response;
     }
