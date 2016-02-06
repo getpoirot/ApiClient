@@ -38,7 +38,7 @@ class HttpSocketConnection extends AbstractTransporter
 
     /*
      * closure:
-     * mixed function($expression) {
+     * mixed function(&$expression) {
      *   // $this will point to HttpSocketConnection (current-class)
      * }
      */
@@ -46,14 +46,14 @@ class HttpSocketConnection extends AbstractTransporter
     /*
      * closure:
      * $continue (object) ['isDone' => false] ## is done true cause not given body part
-     * mixed function($headers, $expression, $continue) {
+     * mixed function(string &$headers, \StdClass &$expression, \StdClass $continue) {
      *   // $this will point to HttpSocketConnection (current-class)
      * }
      */
     const EVENT_RESPONSE_RECEIVED_HEADER   = 'response.received.header';
     /*
      * closure:
-     * mixed function($headers, $body, $expression) {
+     * mixed function(&$headers, &$body, $expression) {
      *   // $this will point to HttpSocketConnection (current-class)
      * }
      */
@@ -137,8 +137,8 @@ class HttpSocketConnection extends AbstractTransporter
      */
     function triggerEvent($eventName, $arguments = null, $_ = null)
     {
-        if (!array_key_exists($eventName, $this->_events))
-            return $this;
+        if (!array_key_exists($eventName, $this->_events) || !$this->_events[$eventName] instanceof OpenCall)
+            return VOID;
 
         $expr = null;
         $args = func_get_args();
@@ -261,7 +261,18 @@ class HttpSocketConnection extends AbstractTransporter
         try
         {
             // Fire up registered methods to prepare expression
-            $expr = $this->triggerEvent(self::EVENT_REQUEST_SEND_PREPARE, $expr);
+            ## we have to use this for just now because we need
+            ## to catch arguments by reference.
+            ## so we cant use call_user_fuc or similar approach
+            /** @var OpenCall $e */
+            $e    = $this->_events[self::EVENT_REQUEST_SEND_PREPARE];
+            if ($e instanceof OpenCall) {
+                foreach($e->listMethods() as $method) {
+                    $method = $e->getMethod($method);
+                    $method($expr);
+                }
+            }
+
             $response = $this->doHandleRequest($expr);
         } catch (\Exception $e) {
             throw new ApiCallException(sprintf(
@@ -349,12 +360,19 @@ class HttpSocketConnection extends AbstractTransporter
         $response = $headers;
         $body     = null;
 
+        // Fire up registered methods to prepare expression
+        ## we have to use this for just now because we need
+        ## to catch arguments by reference.
+        ## so we cant use call_user_fuc or similar approach
+        /** @var OpenCall $e */
         $continue = (object) ['isDone' => false];
-        $response = $this->triggerEvent(self::EVENT_RESPONSE_RECEIVED_HEADER
-            , $response
-            , $this->_tmp_expr
-            , $continue
-        );
+        $e    = $this->_events[self::EVENT_RESPONSE_RECEIVED_HEADER];
+        if ($e instanceof OpenCall) {
+            foreach($e->listMethods() as $method) {
+                $method = $e->getMethod($method);
+                $method($response, $this->_tmp_expr, $continue);
+            }
+        }
 
         if ($continue->isDone)
             // terminate and return response
@@ -372,11 +390,18 @@ class HttpSocketConnection extends AbstractTransporter
 
 finalize:
 
-        $response = $this->triggerEvent(self::EVENT_RESPONSE_RECEIVED_COMPLETE
-            , $response
-            , $body
-            , $this->_tmp_expr
-        );
+        // Fire up registered methods to prepare expression
+        ## we have to use this for just now because we need
+        ## to catch arguments by reference.
+        ## so we cant use call_user_fuc or similar approach
+        /** @var OpenCall $e */
+        $e    = $this->_events[self::EVENT_RESPONSE_RECEIVED_COMPLETE];
+        if ($e instanceof OpenCall) {
+            foreach($e->listMethods() as $method) {
+                $method = $e->getMethod($method);
+                $method($response, $body, $this->_tmp_expr);
+            }
+        }
 
         return $response;
     }
