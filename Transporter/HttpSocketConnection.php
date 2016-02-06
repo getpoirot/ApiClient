@@ -87,6 +87,16 @@ class HttpSocketConnection extends AbstractTransporter
     /** @var \StdClass (object) ['headers'=> .., 'body'=>stream_offset] latest request expression to receive on events */
     protected $_tmp_expr;
 
+    function __construct($options = null)
+    {
+        parent::__construct($options);
+
+        $this->onEvent(self::EVENT_RESPONSE_RECEIVED_COMPLETE, 'getResult' /* override default */
+            , function(&$responseHeaders, &$body, $requestStd) {
+                $responseHeaders = (object) ['header' => $responseHeaders, 'body' => $body];
+                return $responseHeaders;
+            });
+    }
 
     // Events:
 
@@ -120,36 +130,6 @@ class HttpSocketConnection extends AbstractTransporter
         $e->addMethod($listener_closure, $closure);
 
         return $this;
-    }
-
-    /**
-     * Trigger Event by Call Listeners Attached To That Event
-     *
-     * - do nothing if event not registered
-     *
-     * @param string $eventName
-     *
-     * // triggerEvent($eventName, $arg1, $arg2, ...)
-     * @param null $arguments
-     * @param null $_
-     *
-     * @return VOID|mixed void if not any event registerd
-     */
-    function triggerEvent($eventName, $arguments = null, $_ = null)
-    {
-        if (!array_key_exists($eventName, $this->_events) || !$this->_events[$eventName] instanceof OpenCall)
-            return VOID;
-
-        $expr = null;
-        $args = func_get_args();
-        array_shift($args);
-
-        /** @var OpenCall $e */
-        $e    = $this->_events[$eventName];
-        foreach($e->listMethods() as $method)
-            $expr = call_user_func_array([$e, $method], $args);
-
-        return $expr;
     }
 
     /**
