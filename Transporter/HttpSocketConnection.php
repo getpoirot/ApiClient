@@ -153,6 +153,9 @@ class HttpSocketConnection extends AbstractTransporter
      * TODO make request and response are too slow
      * Send Expression On the wire
      *
+     * - be aware if you pass streamable it will continue from current
+     *   not rewind implemented here
+     *
      * !! get expression from getRequest()
      *
      * @throws ApiCallException|ConnectException
@@ -193,7 +196,7 @@ class HttpSocketConnection extends AbstractTransporter
         catch (\Exception $e) {
             throw new ApiCallException(sprintf(
                 'Request Call Error When Send To Server (%s)'
-                , $this->streamable->getResource()->getRemoteName()
+                , $this->inOptions()->getServerUrl()
             ), 0, 1, __FILE__, __LINE__, $e);
         }
 
@@ -251,7 +254,6 @@ class HttpSocketConnection extends AbstractTransporter
     {
         # send request
         $headers = $this->__readHeadersFromStream($expr);
-
         $this->streamable->write($headers);
         $expr->pipeTo($this->streamable);
 
@@ -281,7 +283,8 @@ class HttpSocketConnection extends AbstractTransporter
 
         $stream = $this->streamable;
 
-        if ($stream->getResource()->meta()->isTimedOut())
+        $streamMeta = $stream->getResource()->meta();
+        if ($streamMeta && $streamMeta->isTimedOut())
             throw new \RuntimeException(
                 "Read timed out after {$this->inOptions()->getTimeout()} seconds."
             );
@@ -382,7 +385,9 @@ finalize:
     protected function __readHeadersFromStream(iStreamable $stream)
     {
         $headers = '';
-        while(!$stream->isEOF() && ($line = $stream->readLine("\r\n")) !== null ) {
+        ## 255 can be vary, its each header length.
+        // TODO just read header part from aggregate stream, it can be tagged for each stream
+        while(!$stream->isEOF() && ($line = $stream->readLine("\r\n", 255)) !== null ) {
             $break = false;
             $headers .= $line."\r\n";
             if (trim($line) === '') {
