@@ -23,6 +23,7 @@ $httpRequest = new HttpRequest([
 
 $stream = new HttpSocketConnection(['server_url' => 'http://95.211.189.240/']);
 $startTime = microtime(true);
+($stream->isConnected()) ?: $stream->getConnect();
 $res = $stream->send($httpRequest->toString());
 printf("HttpSocket: %f<br/>", microtime(true) - $startTime);
 
