@@ -24,10 +24,29 @@ interface iTransporter extends iOptionsProvider
     function getConnect();
 
     /**
+     * Set Request Expression To Send Over Wire
+     *
+     * @param mixed $expr
+     *
+     * @return $this
+     */
+    function request($expr);
+
+    /**
+     * Get Latest Request
+     *
+     * @return null|mixed
+     */
+    function getRequest();
+
+    /**
      * Send Expression To Server
      *
      * - send expression to server through transporter
      *   resource
+     *
+     * - don't set request globally through request() if
+     *   expr set
      *
      * !! it must be connected
      *
@@ -36,7 +55,7 @@ interface iTransporter extends iOptionsProvider
      * @throws ApiCallException|ConnectException
      * @return mixed Prepared Server Response
      */
-    function send($expr);
+    function send($expr = null);
 
     /**
      * Receive Server Response

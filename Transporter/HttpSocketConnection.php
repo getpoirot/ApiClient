@@ -4,6 +4,7 @@ namespace Poirot\ApiClient\Transporter;
 use Poirot\ApiClient\AbstractTransporter;
 use Poirot\ApiClient\Exception\ApiCallException;
 use Poirot\ApiClient\Exception\ConnectException;
+use Poirot\Core\Interfaces\iDataSetConveyor;
 use Poirot\Core\OpenCall;
 use Poirot\Core\Traits\CloneTrait;
 use Poirot\Stream\Interfaces\iStreamable;
@@ -36,36 +37,6 @@ class HttpSocketConnection extends AbstractTransporter
 {
     use CloneTrait;
 
-    /*
-     * closure:
-     * mixed function(&$expression) {
-     *   // $this will point to HttpSocketConnection (current-class)
-     * }
-     */
-    const EVENT_REQUEST_SEND_PREPARE       = 'request.send.prepare';
-    /*
-     * closure:
-     * $continue (object) ['isDone' => false] ## is done true cause not given body part
-     * mixed function(string &$headers, \StdClass &$expression, \StdClass $continue) {
-     *   // $this will point to HttpSocketConnection (current-class)
-     * }
-     */
-    const EVENT_RESPONSE_RECEIVED_HEADER   = 'response.received.header';
-    /*
-     * closure:
-     * mixed function(&$headers, &$body, $expression) {
-     *   // $this will point to HttpSocketConnection (current-class)
-     * }
-     */
-    const EVENT_RESPONSE_RECEIVED_COMPLETE = 'response.received.complete';
-
-    protected $_events = [
-        self::EVENT_REQUEST_SEND_PREPARE       => /* OpenCall */ null,
-        self::EVENT_RESPONSE_RECEIVED_HEADER   => null,
-        self::EVENT_RESPONSE_RECEIVED_COMPLETE => null,
-        // ...
-    ];
-
     /** @var Streamable When Connected */
     protected $streamable;
 
@@ -78,58 +49,25 @@ class HttpSocketConnection extends AbstractTransporter
     /** @var bool  */
     protected $lastReceive = false;
 
-    /**
-     * Write Received Server Data To It Until Complete
-     * @var Streamable\TemporaryStream */
-    protected $_buffer;
-    protected $_buffer_seek = 0;
-
     /** @var \StdClass (object) ['headers'=> .., 'body'=>stream_offset] latest request expression to receive on events */
     protected $_tmp_expr;
 
-    function __construct($options = null)
-    {
-        parent::__construct($options);
-
-        $this->onEvent(self::EVENT_RESPONSE_RECEIVED_COMPLETE, 'getResult' /* override default */
-            , function(&$responseHeaders, &$body, $requestStd) {
-                $responseHeaders = (object) ['header' => $responseHeaders, 'body' => $body];
-                return $responseHeaders;
-            });
-    }
-
-    // Events:
-
     /**
-     * Add Listener To Specific Event
+     * Construct
      *
-     * - if listener name not passed it must used default unique name
-     * - if listener name exists it will override by new one
+     * - pass transporter options on construct
      *
-     * @param string               $eventName
-     * @param null|string|\Closure $listener_closure
-     * @param \Closure|null        $closure
-     *
-     * @return $this
+     * @param null|string|$options        $serverUri_options
+     * @param array|iDataSetConveyor|null $options           Transporter Options
      */
-    function onEvent($eventName, $listener_closure = null, \Closure $closure = null)
+    function __construct($serverUri_options = null, $options = null)
     {
-        if (!array_key_exists($eventName, $this->_events) || !$this->_events[$eventName] instanceof OpenCall)
-            $this->_events[$eventName] = (new OpenCall)->bindTo($this);
+        if (is_array($serverUri_options) || $serverUri_options instanceof iDataSetConveyor)
+            $options = $serverUri_options;
+        elseif(is_string($serverUri_options))
+            $this->inOptions()->setServerUrl($serverUri_options);
 
-        if ($listener_closure instanceof \Closure) {
-            // onEvent('event', function() ..)
-            $closure = $listener_closure;
-            $listener_closure = null;
-        }
-
-        /** @var OpenCall $e */
-        ($listener_closure !== null) ?: $listener_closure = uniqid();
-
-        $e = $this->_events[$eventName];
-        $e->addMethod($listener_closure, $closure);
-
-        return $this;
+        parent::__construct($options);
     }
 
     /**
@@ -142,7 +80,7 @@ class HttpSocketConnection extends AbstractTransporter
      * @throws \Exception
      * @return mixed Transporter Resource
      */
-    function getConnect()
+    final function getConnect()
     {
         if ($this->isConnected())
             ## close current transporter if connected
@@ -161,6 +99,35 @@ class HttpSocketConnection extends AbstractTransporter
         if (!$serverUrl)
             throw new \RuntimeException('Server Url is Mandatory For Connect.');
 
+
+        // get connect
+
+        try{
+            $this->streamable = $this->doConnect($serverUrl);
+        } catch(\Exception $e)
+        {
+            throw new \Exception(sprintf(
+                'Cannot connect to (%s).'
+                , $serverUrl
+                , $e->getCode()
+                , $e ## as previous exception
+            ));
+        }
+
+        return $this->streamable;
+    }
+
+    /**
+     * Do Connect To Server With Streamable
+     *
+     * @param string $serverUrl
+     *
+     * @return iStreamable
+     */
+    function doConnect($serverUrl)
+    {
+        // TODO validate scheme, ssl connection
+
         $parsedServerUrl = parse_url($serverUrl);
         $parsedServerUrl['scheme'] = 'tcp';
         (isset($parsedServerUrl['port'])) ?: $parsedServerUrl['port'] = 80;
@@ -177,60 +144,25 @@ class HttpSocketConnection extends AbstractTransporter
         $stream->setTimeout($this->inOptions()->getTimeout());
         $stream->setPersist($this->inOptions()->isPersist());
 
-        try{
-            $resource = $stream->getConnect();
-        } catch(\Exception $e)
-        {
-            throw new \Exception(sprintf(
-                'Cannot connect to (%s).'
-                , $serverUrl
-                , $e->getCode()
-                , $e ## as previous exception
-            ));
-        }
-
-        $this->streamable = new Streamable($resource);
-        return $this->streamable;
+        $resource = $stream->getConnect();
+        return new Streamable($resource);
     }
-
-        protected function __unparse_url($parsed_url) {
-            $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
-            $host     = isset($parsed_url['host']) ? $parsed_url['host'] : '';
-            $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
-            $user     = isset($parsed_url['user']) ? $parsed_url['user'] : '';
-            $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
-            $pass     = ($user || $pass) ? "$pass@" : '';
-            $path     = isset($parsed_url['path']) ? $parsed_url['path'] : '';
-            $query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
-            $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
-            return "$scheme$user$pass$host$port$path$query$fragment";
-        }
 
     /**
      * TODO make request and response are too slow
+     * Send Expression On the wire
      *
-     * Send Expression To Server
-     *
-     * - send expression to server through transporter
-     *   resource
-     *
-     * !! it must be connected
-     *
-     * @param string|iStreamable $expr Expression
+     * !! get expression from getRequest()
      *
      * @throws ApiCallException|ConnectException
      * @return string Response
      */
-    function send($expr)
+    final function doSend()
     {
 //        $start = microtime(true);
 
         # prepare new request
         $this->lastReceive = null;
-
-        ## destruct buffer
-        $this->_getBufferStream()->getResource()->close();
-        $this->_buffer = null;
 
         # get connect if not
         if (!$this->isConnected())
@@ -240,43 +172,9 @@ class HttpSocketConnection extends AbstractTransporter
         # write stream
         try
         {
-            // Fire up registered methods to prepare expression
-            ## we have to use this for just now because we need
-            ## to catch arguments by reference.
-            ## so we cant use call_user_fuc or similar approach
-            /** @var OpenCall $e */
-            $e    = $this->_events[self::EVENT_REQUEST_SEND_PREPARE];
-            if ($e instanceof OpenCall) {
-                foreach($e->listMethods() as $method) {
-                    $method = $e->getMethod($method);
-                    $method($expr);
-                }
-            }
-
-            $response = $this->doHandleRequest($expr);
-        } catch (\Exception $e) {
-            throw new ApiCallException(sprintf(
-                'Request Call Error When Send To Server (%s)'
-                , $this->streamable->getResource()->getRemoteName()
-            ), 0, 1, __FILE__, __LINE__, $e);
-        }
-
-//        printf("get connect: %f<br/>", microtime(true) - $start);
-
-        $this->lastReceive = $response;
-        return $response;
-    }
-
-        /**
-         * Send Request To Server And Receive Response
-         *
-         * @param iStreamable|string|mixed $expr
-         *
-         * @throws \Exception
-         * @return string
-         */
-        protected function doHandleRequest($expr)
-        {
+            ## prepare expression before send
+            $expr = $this->getRequest();
+            $expr = $this->onBeforeSendPrepareExpression($expr);
             if (is_object($expr) && !$expr instanceof iStreamable)
                 $expr = (string) $expr;
 
@@ -289,17 +187,77 @@ class HttpSocketConnection extends AbstractTransporter
                     , \Poirot\Core\flatten($expr)
                 ));
 
-            # send request
-            $headers = $this->__readHeadersFromStream($expr);
-            $this->_tmp_expr = (object) ['headers' => $headers, 'body'=> $expr->getCurrOffset()];
-
-            $this->streamable->write($headers);
-            $expr->pipeTo($this->streamable);
-
-            # receive rest response body
-            $response = $this->receive();
-            return $response;
+            $response = $this->__handleReqRes($expr);
         }
+        catch (\Exception $e) {
+            throw new ApiCallException(sprintf(
+                'Request Call Error When Send To Server (%s)'
+                , $this->streamable->getResource()->getRemoteName()
+            ), 0, 1, __FILE__, __LINE__, $e);
+        }
+
+//        printf("get connect: %f<br/>", microtime(true) - $start);
+
+        $this->lastReceive = $response;
+        return $response;
+    }
+
+    /**
+     * Before Send Prepare Expression
+     * @param mixed $expr
+     * @return iStreamable|string
+     */
+    function onBeforeSendPrepareExpression($expr)
+    {
+        return $expr;
+    }
+
+    /**
+     * $responseHeaders can be changed by reference
+     *
+     * @param string $responseHeaders
+     *
+     * @return boolean consider continue with reading body from stream?
+     */
+    function onResponseHeaderReceived(&$responseHeaders)
+    {
+        return true; // keep continue
+    }
+
+    /**
+     * Get Body And Response Headers And Return Expected Response
+     *
+     * @param string|mixed     $responseHeaders default has headers string but it can changed
+     *                                          with onResponseHeaderReceived
+     * @param iStreamable|null $body
+     *
+     * @return mixed Expected Response
+     */
+    function onResponseReceivedComplete($responseHeaders, $body)
+    {
+        return (object) ['header' => $responseHeaders, 'body' => $body];
+    }
+
+    /**
+     * Send Request To Server And Receive Response
+     *
+     * @param iStreamable $expr
+     *
+     * @throws \Exception
+     * @return string
+     */
+    final protected function __handleReqRes($expr)
+    {
+        # send request
+        $headers = $this->__readHeadersFromStream($expr);
+
+        $this->streamable->write($headers);
+        $expr->pipeTo($this->streamable);
+
+        # receive rest response body
+        $response = $this->receive();
+        return $response;
+    }
 
     /**
      * Receive Server Response
@@ -314,14 +272,11 @@ class HttpSocketConnection extends AbstractTransporter
      * @throws \Exception No Transporter established
      * @return null|string|Streamable
      */
-    function receive()
+    final function receive()
     {
         if ($this->lastReceive)
             return $this->lastReceive;
 
-        ## so we can read later from latest position to end
-        ## in example when we write header we can retrieve header next time
-        $curSeek = $this->_buffer_seek;
 
         $stream = $this->streamable;
 
@@ -332,86 +287,31 @@ class HttpSocketConnection extends AbstractTransporter
 
         # read headers:
         $headers = $this->__readHeadersFromStream($stream);
+        $body    = null;
 
         if (empty($headers))
             throw new \Exception('Server not respond to this request.');
 
         // Fire up registered methods to prepare expression
-        $response = $headers;
-        $body     = null;
-
-        // Fire up registered methods to prepare expression
-        ## we have to use this for just now because we need
-        ## to catch arguments by reference.
-        ## so we cant use call_user_fuc or similar approach
-        /** @var OpenCall $e */
-        $continue = (object) ['isDone' => false];
-        $e    = $this->_events[self::EVENT_RESPONSE_RECEIVED_HEADER];
-        if ($e instanceof OpenCall) {
-            foreach($e->listMethods() as $method) {
-                $method = $e->getMethod($method);
-                $method($response, $this->_tmp_expr, $continue);
-            }
-        }
-
-        if ($continue->isDone)
+        $responseHeaders = $headers;
+        // Header Received:
+        if (!$this->onResponseHeaderReceived($responseHeaders))
             // terminate and return response
             goto finalize;
 
+
         # read body:
+        $buffer = static::_newBufferStream();
         while(!$stream->isEOF()) {
             $body .= $stream->read(1024);
-
-            $this->_getBufferStream()->seek($this->_buffer_seek);
-            $this->_getBufferStream()->write($body);
-            $this->_buffer_seek += $this->_getBufferStream()->getTransCount();
+            $buffer->write($body);
         }
-        $body = $this->_getBufferStream()->seek($curSeek);
+        $body = $buffer;
 
 finalize:
 
-        // Fire up registered methods to prepare expression
-        ## we have to use this for just now because we need
-        ## to catch arguments by reference.
-        ## so we cant use call_user_fuc or similar approach
-        /** @var OpenCall $e */
-        $e    = $this->_events[self::EVENT_RESPONSE_RECEIVED_COMPLETE];
-        if ($e instanceof OpenCall) {
-            foreach($e->listMethods() as $method) {
-                $method = $e->getMethod($method);
-                $method($response, $body, $this->_tmp_expr);
-            }
-        }
-
-        return $response;
+        return $this->onResponseReceivedComplete($responseHeaders, $body);
     }
-
-        protected function __readHeadersFromStream(iStreamable $stream)
-        {
-            $headers = '';
-            while(!$stream->isEOF() && ($line = $stream->readLine("\r\n")) !== null ) {
-                $break = false;
-                $headers .= $line."\r\n";
-                if (trim($line) === '') {
-                    ## http headers part read complete
-                    $break = true;
-                }
-
-                if ($break) break;
-            }
-
-            return $headers;
-        }
-
-        protected function _getBufferStream()
-        {
-            if (!$this->_buffer) {
-                $this->_buffer = new Streamable\TemporaryStream();
-                $this->_buffer_seek = 0;
-            }
-
-            return $this->_buffer;
-        }
 
     /**
      * Is Transporter Resource Available?
@@ -437,7 +337,8 @@ finalize:
         $this->connected_options = null;
     }
 
-    // options
+
+    // options:
 
     /**
      * @override just for ide completion
@@ -459,5 +360,43 @@ finalize:
     static function newOptions($builder = null)
     {
         return new HttpSocketOptions($builder);
+    }
+
+
+    // ...
+
+    protected function __unparse_url($parsed_url) {
+        $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
+        $host     = isset($parsed_url['host']) ? $parsed_url['host'] : '';
+        $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
+        $user     = isset($parsed_url['user']) ? $parsed_url['user'] : '';
+        $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
+        $pass     = ($user || $pass) ? "$pass@" : '';
+        $path     = isset($parsed_url['path']) ? $parsed_url['path'] : '';
+        $query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
+        $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
+        return "$scheme$user$pass$host$port$path$query$fragment";
+    }
+
+    protected function __readHeadersFromStream(iStreamable $stream)
+    {
+        $headers = '';
+        while(!$stream->isEOF() && ($line = $stream->readLine("\r\n")) !== null ) {
+            $break = false;
+            $headers .= $line."\r\n";
+            if (trim($line) === '') {
+                ## http headers part read complete
+                $break = true;
+            }
+
+            if ($break) break;
+        }
+
+        return $headers;
+    }
+
+    protected static function _newBufferStream()
+    {
+        return new Streamable\TemporaryStream();
     }
 }

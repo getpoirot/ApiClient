@@ -17,6 +17,8 @@ abstract class AbstractTransporter implements iTransporter
 
     /** @var iPoirotOptions */
     protected $options;
+    /** @var mixed Expression to Send */
+    protected $expr;
 
     /**
      * Construct
@@ -56,7 +58,31 @@ abstract class AbstractTransporter implements iTransporter
      * @throws ApiCallException|ConnectException
      * @return mixed Prepared Server Response
      */
-    abstract function send($expr);
+    final function send($expr = null)
+    {
+        if ($expr === null)
+            $expr = $this->getRequest();
+
+        if ($expr === null)
+            throw new \InvalidArgumentException(
+                'Expression not set, nothing to do.'
+            );
+
+        # ! # remember last request
+        $this->request($expr);
+        $result = $this->doSend();
+        return $result;
+    }
+
+    /**
+     * Send Expression On the wire
+     *
+     * !! get expression from getRequest()
+     *
+     * @throws ApiCallException|ConnectException
+     * @return mixed Response
+     */
+    abstract function doSend();
 
     /**
      * Receive Server Response
@@ -82,6 +108,31 @@ abstract class AbstractTransporter implements iTransporter
      * @return void
      */
     abstract function close();
+
+
+    /**
+     * Set Request Expression To Send Over Wire
+     *
+     * @param mixed $expr
+     *
+     * @return $this
+     */
+    function request($expr)
+    {
+        $this->expr = $expr;
+        return $this;
+    }
+
+    /**
+     * Get Latest Request
+     *
+     * @return null|mixed
+     */
+    function getRequest()
+    {
+        return $this->expr;
+    }
+
 
     // ...
 
