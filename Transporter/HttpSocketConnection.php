@@ -254,6 +254,7 @@ class HttpSocketConnection extends AbstractTransporter
     {
         # send request
         $headers = $this->__readHeadersFromStream($expr);
+
         $this->streamable->write($headers);
         $expr->pipeTo($this->streamable);
 
@@ -305,6 +306,16 @@ class HttpSocketConnection extends AbstractTransporter
 
 
         # read body:
+
+        /* // TODO follow these rules otherwise you will get timeout message
+         * indicate the end of response from server:
+         *
+         * (1) closing the connection;
+         * (2) examining Content-Length;
+         * (3) getting all chunks in the case of Transfer-Encoding: Chunked.
+         * There is also
+         * (4) the timeout method: assume that the timeout means end of data, but the latter is not really reliable.
+         */
         $buffer = static::_newBufferStream();
         while(!$stream->isEOF()) {
             $body .= $stream->read(1024);
@@ -401,6 +412,9 @@ finalize:
         return $headers;
     }
 
+    /**
+     * @return Streamable\TemporaryStream
+     */
     protected static function _newBufferStream()
     {
         return new Streamable\TemporaryStream();
