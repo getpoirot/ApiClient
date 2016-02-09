@@ -3,13 +3,14 @@ namespace Poirot\ApiClient\Interfaces;
 
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
+use Poirot\Connection\Interfaces\iConnection;
 
 interface iClient
 {
     /**
      * Get Transporter Adapter
      *
-     * @return iTransporter
+     * @return iConnection
      */
     function transporter();
 

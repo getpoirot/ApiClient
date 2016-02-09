@@ -7,7 +7,7 @@ use Poirot\Core\Interfaces\iDataSetConveyor;
  * Api Method Then Build Via Platform And Turn To Expression
  * That Can Send Via Transporter Exec Method.
  *
- * @see iTransporter::send
+ * @see iConnection::send
  */
 interface iApiMethod extends iDataSetConveyor
 {

@@ -3,11 +3,11 @@ namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Exception\ConnectException;
 use Poirot\ApiClient\Interfaces\iClient;
-use Poirot\ApiClient\Interfaces\iTransporter;
 use Poirot\ApiClient\Interfaces\iPlatform;
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 use Poirot\ApiClient\Request\Method;
+use Poirot\Connection\Interfaces\iConnection;
 
 abstract class AbstractClient implements iClient
 {
@@ -17,7 +17,7 @@ abstract class AbstractClient implements iClient
     ## and Transporter class property
     /** @var iPlatform */
     protected $platform;
-    /** @var iTransporter */
+    /** @var iConnection */
     protected $transporter;
 
     /**

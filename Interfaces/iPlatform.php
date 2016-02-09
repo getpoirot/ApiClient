@@ -3,6 +3,7 @@ namespace Poirot\ApiClient\Interfaces;
 
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
+use Poirot\Connection\Interfaces\iConnection;
 
 interface iPlatform
 {
@@ -13,13 +14,13 @@ interface iPlatform
      * - manipulate header or something in transporter
      * - get connect to resource
      *
-     * @param iTransporter      $transporter
+     * @param iConnection      $transporter
      * @param iApiMethod|null  $method
      *
      * @throws \Exception
-     * @return iTransporter
+     * @return iConnection
      */
-    function prepareTransporter(iTransporter $transporter, $method = null);
+    function prepareTransporter(iConnection $transporter, $method = null);
 
     /**
      * Build Platform Specific Expression To Send
