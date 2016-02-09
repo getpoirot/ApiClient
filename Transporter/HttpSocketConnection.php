@@ -7,6 +7,7 @@ use Poirot\ApiClient\Exception\ConnectException;
 use Poirot\Core\Interfaces\iDataSetConveyor;
 use Poirot\Core\OpenCall;
 use Poirot\Core\Traits\CloneTrait;
+use Poirot\HttpAgent\Transporter\StreamFilter\ChunkTransferDecodeFilter;
 use Poirot\Stream\Interfaces\iStreamable;
 use Poirot\Stream\Streamable;
 use Poirot\Stream\StreamClient;
@@ -306,9 +307,7 @@ class HttpSocketConnection extends AbstractTransporter
 
 
         # read body:
-
-        /* // TODO follow these rules otherwise you will get timeout message
-         * indicate the end of response from server:
+        /* indicate the end of response from server:
          *
          * (1) closing the connection;
          * (2) examining Content-Length;
@@ -317,11 +316,37 @@ class HttpSocketConnection extends AbstractTransporter
          * (4) the timeout method: assume that the timeout means end of data, but the latter is not really reliable.
          */
         $buffer = static::_newBufferStream();
-        while(!$stream->isEOF()) {
-            $body .= $stream->read(1024);
-            $buffer->write($body);
+
+        $headers = self::parseHeaderLines($headers);
+        if (array_key_exists('Content-Length', $headers)) {
+            // (2) examining Content-Length;
+            $length = (int) $headers['Content-Length'];
+            $stream->pipeTo($buffer, $length);
+        } elseif (array_key_exists('Transfer-Encoding', $headers) && $headers['Transfer-Encoding'] == 'chunked') {
+            // (3) Chunked
+            # ! # read data but remain origin chunked data
+            $delim = "\r\n";
+            do {
+                $chunkSize = $stream->readLine($delim);
+                ## ! remain chunked
+                $buffer->write($chunkSize.$delim);
+
+                if ($chunkSize === $delim)
+                    continue;
+
+                ### read this chunk of data
+                $stream->pipeTo($buffer, hexdec($chunkSize));
+
+            } while ($chunkSize !== "0");
+            ## ! write end CLRF
+            $buffer->write($delim);
+
+        } else {
+            // ..
+            $stream->pipeTo($buffer);
         }
-        $body = $buffer;
+
+        $body = $buffer->rewind();
 
 finalize:
 
@@ -377,6 +402,30 @@ finalize:
         return new HttpSocketOptions($builder);
     }
 
+    // util:
+
+    /**
+     * Parse Header line
+     *
+     * @param string $message
+     *
+     * @return false|array[string 'label', string 'value']
+     */
+    static function parseHeaderLines($message)
+    {
+        if (!preg_match_all('/.*[\n]?/', $message, $lines))
+            throw new \InvalidArgumentException('Error Parsing Request Message.');
+
+        $lines = $lines[0];
+
+        $headers = [];
+        foreach ($lines as $line) {
+            if (preg_match('/^(?P<label>[^()><@,;:\"\\/\[\]?=}{ \t]+):(?P<value>.*)$/', $line, $matches))
+                $headers[$matches['label']] = trim($matches['value']);
+        }
+
+        return $headers;
+    }
 
     // ...
 
