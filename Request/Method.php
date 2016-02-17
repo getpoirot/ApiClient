@@ -2,7 +2,7 @@
 namespace Poirot\ApiClient\Request;
 
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
-use Poirot\Std\BuilderSetterTrait;
+use Poirot\Std\SetterBuilderTrait;
 
 /**
  * TODO define parameters name for method
@@ -13,7 +13,7 @@ use Poirot\Std\BuilderSetterTrait;
  */
 class Method implements iApiMethod
 {
-    use BuilderSetterTrait;
+    use SetterBuilderTrait;
 
     /** @var array Method Namespace */
     protected $namespace = [];

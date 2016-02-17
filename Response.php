@@ -2,13 +2,13 @@
 namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Interfaces\Response\iResponse;
-use Poirot\Std\BuilderSetterTrait;
-use Poirot\Std\Entity;
+use Poirot\Std\SetterBuilderTrait;
 use Poirot\Std\Interfaces\Struct\iStructDataConveyor;
+use Poirot\Std\Struct\Entity;
 
 class Response implements iResponse
 {
-    use BuilderSetterTrait;
+    use SetterBuilderTrait;
 
     /** @var Entity */
     protected $meta;

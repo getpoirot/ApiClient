@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\ApiClient\Interfaces\Response;
 
-use Poirot\Std\Entity;
+use Poirot\Std\Struct\Entity;
 use Poirot\Stream\Interfaces\iStreamable;
 
 interface iResponse
