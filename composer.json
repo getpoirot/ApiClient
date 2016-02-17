@@ -11,7 +11,7 @@
     ]
     , "target-dir": "Poirot/ApiClient"
     , "require": {
-        "poirot/core": "dev-master"
+        "poirot/std": "dev-master"
     }
     , "autoload"  : {
         "psr-0": {

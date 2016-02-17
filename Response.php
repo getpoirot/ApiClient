@@ -2,9 +2,9 @@
 namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Interfaces\Response\iResponse;
-use Poirot\Core\BuilderSetterTrait;
-use Poirot\Core\Entity;
-use Poirot\Core\Interfaces\iDataSetConveyor;
+use Poirot\Std\BuilderSetterTrait;
+use Poirot\Std\Entity;
+use Poirot\Std\Interfaces\Struct\iStructDataConveyor;
 
 class Response implements iResponse
 {
@@ -48,7 +48,7 @@ class Response implements iResponse
 
     /**
      * Setter Helper For Meta Data
-     * @param array|iDataSetConveyor $dataSet
+     * @param array|iStructDataConveyor $dataSet
      * @return $this
      */
     function setMeta($dataSet)

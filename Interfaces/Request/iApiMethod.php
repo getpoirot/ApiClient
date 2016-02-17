@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\ApiClient\Interfaces\Request;
 
-use Poirot\Core\Interfaces\iDataSetConveyor;
+use Poirot\Std\Interfaces\Struct\iStructDataConveyor;
 
 /**
  * Api Method Then Build Via Platform And Turn To Expression
@@ -9,7 +9,7 @@ use Poirot\Core\Interfaces\iDataSetConveyor;
  *
  * @see iConnection::send
  */
-interface iApiMethod extends iDataSetConveyor
+interface iApiMethod extends iStructDataConveyor
 {
     /**
      * Set Namespaces prefix
