@@ -4,13 +4,6 @@ namespace Poirot\ApiClient\Request;
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\Std\SetterBuilderTrait;
 
-/**
- * TODO define parameters name for method
- *      it can be used as notation docblock
- *      or used as setter method
- *
- *     ($country, $offset, $limit)
- */
 class Method implements iApiMethod
 {
     use SetterBuilderTrait;
@@ -137,7 +130,6 @@ class Method implements iApiMethod
     function setNamespace(array $namespaces = [])
     {
         $this->namespace = $namespaces;
-
         return $this;
     }
 
@@ -164,7 +156,6 @@ class Method implements iApiMethod
         $namespaces[] = $namespace;
 
         $this->namespace = $namespaces;
-
         return $this;
     }
 
@@ -178,7 +169,6 @@ class Method implements iApiMethod
     function setMethod($method)
     {
         $this->method = $method;
-
         return $this;
     }
 
@@ -205,7 +195,6 @@ class Method implements iApiMethod
     function setArguments(array $args)
     {
         $this->args = $args;
-
         return $this;
     }
 
@@ -220,33 +209,5 @@ class Method implements iApiMethod
     function getArguments()
     {
         return $this->args;
-    }
-
-    /**
-     * Set Options From Array
-     *
-     * @param array $options Options Array
-     *
-     * @throws \Exception
-     * @return $this
-     */
-    function fromArray(array $options)
-    {
-        $this->setupFromArray($options);
-        return $this;
-    }
-
-    /**
-     * Get Properties as array
-     *
-     * @return array
-     */
-    function toArray()
-    {
-        return [
-            'namespace' => $this->getNamespace(),
-            'method'    => $this->getMethod(),
-            'arguments' => $this->getArguments(),
-        ];
     }
 }

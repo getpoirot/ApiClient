@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\ApiClient\Interfaces\Response;
 
-use Poirot\Std\Struct\Entity;
+use Poirot\Std\Struct\EntityData;
 use Poirot\Stream\Interfaces\iStreamable;
 
 interface iResponse
@@ -9,7 +9,7 @@ interface iResponse
     /**
      * Meta Data Or Headers
      *
-     * @return Entity
+     * @return EntityData
      */
     function meta();
 

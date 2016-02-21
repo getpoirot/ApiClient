@@ -1,15 +1,13 @@
 <?php
 namespace Poirot\ApiClient\Interfaces\Request;
 
-use Poirot\Std\Interfaces\Struct\iStructDataConveyor;
-
 /**
  * Api Method Then Build Via Platform And Turn To Expression
  * That Can Send Via Transporter Exec Method.
  *
  * @see iConnection::send
  */
-interface iApiMethod extends iStructDataConveyor
+interface iApiMethod
 {
     /**
      * Set Namespaces prefix

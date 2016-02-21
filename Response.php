@@ -3,14 +3,14 @@ namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 use Poirot\Std\SetterBuilderTrait;
-use Poirot\Std\Interfaces\Struct\iStructDataConveyor;
-use Poirot\Std\Struct\Entity;
+use Poirot\Std\Interfaces\Struct\iDataStruct;
+use Poirot\Std\Struct\EntityData;
 
 class Response implements iResponse
 {
     use SetterBuilderTrait;
 
-    /** @var Entity */
+    /** @var EntityData */
     protected $meta;
     /** @var string Origin Response Body */
     protected $rawbody;
@@ -36,19 +36,19 @@ class Response implements iResponse
     /**
      * Meta Data Or Headers
      *
-     * @return Entity
+     * @return EntityData
      */
     function meta()
     {
         if (!$this->meta)
-            $this->meta = new Entity;
+            $this->meta = new EntityData;
 
         return $this->meta;
     }
 
     /**
      * Setter Helper For Meta Data
-     * @param array|iStructDataConveyor $dataSet
+     * @param array|iDataStruct $dataSet
      * @return $this
      */
     function setMeta($dataSet)
