@@ -10,18 +10,9 @@
         }
     ]
     , "target-dir": "Poirot/ApiClient"
-    , "require": {
-        "poirot/std": "dev-devel"
-    }
     , "autoload"  : {
         "psr-0": {
             "Poirot\\ApiClient": "."
         }
     }
-    , "repositories": [
-      {
-        "type": "git",
-        "url": "https://github.com/phPoirot/Std.git"
-      }
-    ]
 }
