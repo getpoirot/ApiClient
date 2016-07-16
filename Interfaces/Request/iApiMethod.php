@@ -47,9 +47,6 @@ interface iApiMethod
     /**
      * Set Method Arguments
      *
-     * - it will replace current arguments
-     * - use empty array to clear arguments
-     *
      * @param array $args Arguments
      *
      * @return $this
@@ -65,4 +62,10 @@ interface iApiMethod
      * @return array
      */
     function getArguments();
+
+    /**
+     * Clear All Arguments (to it's default)
+     * @return $this
+     */
+    function clearArguments();
 }

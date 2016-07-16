@@ -4,6 +4,7 @@ namespace Poirot\ApiClient\Request;
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 
 use Poirot\Std\ConfigurableSetter;
+use Poirot\Std\Type\StdArray;
 
 class Method 
     extends ConfigurableSetter
@@ -45,7 +46,6 @@ class Method
     {
         # append namespace
         $this->namespace_getter[] = $namespace;
-
         return $this;
     }
 
@@ -171,16 +171,16 @@ class Method
     /**
      * Set Method Arguments
      *
-     * - it will replace current arguments
-     * - use empty array to clear arguments
-     *
      * @param array $args Arguments
      *
      * @return $this
      */
     function setArguments(array $args)
     {
-        $this->args = $args;
+        $current    = new StdArray($this->getArguments());
+        $arguments  = $current->withMerge($args);
+        $this->args = $arguments->value; // plain array
+        
         return $this;
     }
 
@@ -195,5 +195,15 @@ class Method
     function getArguments()
     {
         return $this->args;
+    }
+
+    /**
+     * Clear All Arguments (to it's default)
+     * @return $this
+     */
+    function clearArguments()
+    {
+        $this->args = array();
+        return $this;
     }
 }

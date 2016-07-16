@@ -13,9 +13,9 @@ use Poirot\Connection\Interfaces\iConnection;
 abstract class aClient 
     implements iClient
 {
-    ## in case of using magic get method
+    ## in case of using magic get method (__get)
     ## it's better that classes that extend
-    ## this AbstractClient use same platform
+    ## this Abstract Client use same platform
     ## and Transporter class property
     /** @var iPlatform */
     protected $platform;
