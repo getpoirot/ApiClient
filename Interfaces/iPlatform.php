@@ -3,6 +3,7 @@ namespace Poirot\ApiClient\Interfaces;
 
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
+
 use Poirot\Connection\Interfaces\iConnection;
 
 interface iPlatform

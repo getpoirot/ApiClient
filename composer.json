@@ -9,10 +9,16 @@
             , "role": "Developer"
         }
     ]
+    , "require": {
+      "poirot/connection": "dev-devel"
+    }
     , "target-dir": "Poirot/ApiClient"
     , "autoload"  : {
         "psr-0": {
             "Poirot\\ApiClient": "."
         }
     }
+    ,"repositories": [
+      { "type": "git" ,"url": "https://github.com/phPoirot/Connection.git" }
+    ]
 }

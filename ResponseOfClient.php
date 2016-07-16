@@ -2,15 +2,14 @@
 namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Interfaces\Response\iResponse;
-use Poirot\Std\SetterBuilderTrait;
-use Poirot\Std\Interfaces\Struct\iDataStruct;
-use Poirot\Std\Struct\EntityData;
+use Poirot\Std\ConfigurableSetter;
+use Poirot\Std\Struct\DataMean;
 
-class Response implements iResponse
+class ResponseOfClient
+    extends ConfigurableSetter
+    implements iResponse
 {
-    use SetterBuilderTrait;
-
-    /** @var EntityData */
+    /** @var DataMean */
     protected $meta;
     /** @var string Origin Response Body */
     protected $rawbody;
@@ -23,37 +22,26 @@ class Response implements iResponse
 
 
     /**
-     * Construct
-     *
-     * @param array $options
-     */
-    function __construct(array $options = [])
-    {
-        if (!empty($options))
-            $this->setupFromArray($options);
-    }
-
-    /**
      * Meta Data Or Headers
      *
-     * @return EntityData
+     * @return DataMean
      */
     function meta()
     {
         if (!$this->meta)
-            $this->meta = new EntityData;
+            $this->meta = new DataMean();
 
         return $this->meta;
     }
 
     /**
      * Setter Helper For Meta Data
-     * @param array|iDataStruct $dataSet
+     * @param array|\Traversable $dataSet
      * @return $this
      */
     function setMeta($dataSet)
     {
-        $this->meta()->from($dataSet);
+        $this->meta()->import($dataSet);
         return $this;
     }
 
@@ -67,7 +55,6 @@ class Response implements iResponse
     function setRawBody($content)
     {
         $this->rawbody = $content;
-
         return $this;
     }
 
@@ -90,7 +77,6 @@ class Response implements iResponse
     function setException(\Exception $exception)
     {
         $this->exception = $exception;
-
         return $this;
     }
 

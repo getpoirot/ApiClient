@@ -2,25 +2,26 @@
 namespace Poirot\ApiClient\Request;
 
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
-use Poirot\Std\SetterBuilderTrait;
 
-class Method implements iApiMethod
+use Poirot\Std\ConfigurableSetter;
+
+class Method 
+    extends ConfigurableSetter
+    implements iApiMethod
 {
-    use SetterBuilderTrait;
-
     /** @var array Method Namespace */
-    protected $namespace = [];
+    protected $namespace = array();
 
     /**
      * @var array Getter Namespaces Successive
      *            build from getter call
      */
-    protected $namespace_getter = [];
+    protected $namespace_getter = array();
 
     /**
      * @var array Cached State of Namespace During Getters Call
      */
-    protected $_c__namespace = [];
+    protected $_c__namespace = array();
 
     /**
      * @var string Method
@@ -30,23 +31,8 @@ class Method implements iApiMethod
     /**
      * @var array Method Arguments
      */
-    protected $args = [];
+    protected $args = array();
 
-    /**
-     * Construct
-     *
-     * - Build Method From Setter Setup Options
-     *   'namespaces'
-     *   'method'
-     *   'arguments'
-     *
-     * @param array $setupSetter
-     */
-    function __construct(array $setupSetter = null)
-    {
-       if ($setupSetter !== null)
-           $this->setupFromArray($setupSetter);
-    }
 
     /**
      * Get to next successive namespace
@@ -127,7 +113,7 @@ class Method implements iApiMethod
      *
      * @return $this
      */
-    function setNamespace(array $namespaces = [])
+    function setNamespace(array $namespaces = array())
     {
         $this->namespace = $namespaces;
         return $this;

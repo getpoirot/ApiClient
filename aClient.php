@@ -1,15 +1,17 @@
 <?php
 namespace Poirot\ApiClient;
 
-use Poirot\ApiClient\Exception\ConnectException;
 use Poirot\ApiClient\Interfaces\iClient;
 use Poirot\ApiClient\Interfaces\iPlatform;
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 use Poirot\ApiClient\Request\Method;
+
+use Poirot\Connection\Exception\ConnectException;
 use Poirot\Connection\Interfaces\iConnection;
 
-abstract class AbstractClient implements iClient
+abstract class aClient 
+    implements iClient
 {
     ## in case of using magic get method
     ## it's better that classes that extend

@@ -1,22 +1,23 @@
 <?php
 namespace Poirot\ApiClient\Interfaces\Response;
 
-use Poirot\Std\Struct\EntityData;
-use Poirot\Stream\Interfaces\iStreamable;
+use Poirot\Std\Struct\DataMean;
+
+use Psr\Http\Message\StreamInterface;
 
 interface iResponse
 {
     /**
      * Meta Data Or Headers
      *
-     * @return EntityData
+     * @return DataMean
      */
     function meta();
 
     /**
      * Set Response Origin Content
      *
-     * @param string|iStreamable $content Content Body
+     * @param string|StreamInterface $content Content Body
      *
      * @return $this
      */
@@ -25,7 +26,7 @@ interface iResponse
     /**
      * Get Response Origin Body Content
      *
-     * @return string|iStreamable
+     * @return string|StreamInterface
      */
     function getRawBody();
 
