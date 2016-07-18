@@ -5,7 +5,7 @@ use Poirot\ApiClient\Interfaces\iClient;
 use Poirot\ApiClient\Interfaces\iPlatform;
 use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
-use Poirot\ApiClient\Request\Method;
+use Poirot\ApiClient\Request\Command;
 
 use Poirot\Connection\Exception\ConnectException;
 use Poirot\Connection\Interfaces\iConnection;
@@ -122,7 +122,7 @@ abstract class aClient
     function __method()
     {
         if(!$this->method)
-            $this->method = new Method;
+            $this->method = new Command;
 
         return $this->method;
     }

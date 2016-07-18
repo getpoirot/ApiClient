@@ -6,7 +6,7 @@ use Poirot\ApiClient\Interfaces\Request\iApiMethod;
 use Poirot\Std\ConfigurableSetter;
 use Poirot\Std\Type\StdArray;
 
-class Method 
+class Command
     extends ConfigurableSetter
     implements iApiMethod
 {
