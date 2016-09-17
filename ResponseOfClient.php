@@ -5,6 +5,7 @@ use Poirot\ApiClient\Interfaces\Response\iResponse;
 use Poirot\Std\ConfigurableSetter;
 use Poirot\Std\Struct\DataMean;
 
+
 class ResponseOfClient
     extends ConfigurableSetter
     implements iResponse
@@ -29,7 +30,7 @@ class ResponseOfClient
     function meta()
     {
         if (!$this->meta)
-            $this->meta = new DataMean();
+            $this->meta = new DataMean;
 
         return $this->meta;
     }
@@ -112,16 +113,16 @@ class ResponseOfClient
      * :proc
      * mixed function($originResult);
      *
-     * @param callable $proc
+     * @param callable $callable
      *
      * @return mixed
      */
-    function expected(callable $proc = null)
+    function expected(callable $callable = null)
     {
-        ($proc !== null) ?: $proc = $this->defaultExpected;
+        ($callable !== null) ?: $callable = $this->defaultExpected;
 
-        if ($proc !== null)
-            return call_user_func($proc, $this->rawbody);
+        if ($callable !== null)
+            return call_user_func($callable, $this->rawbody);
 
         return $this->rawbody;
     }

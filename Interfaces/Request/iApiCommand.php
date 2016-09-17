@@ -7,7 +7,7 @@ namespace Poirot\ApiClient\Interfaces\Request;
  *
  * @see iConnection::send
  */
-interface iApiMethod
+interface iApiCommand
 {
     /**
      * Set Namespaces prefix

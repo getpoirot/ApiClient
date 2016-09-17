@@ -3,7 +3,7 @@ namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Interfaces\iClient;
 use Poirot\ApiClient\Interfaces\iPlatform;
-use Poirot\ApiClient\Interfaces\Request\iApiMethod;
+use Poirot\ApiClient\Interfaces\Request\iApiCommand;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 use Poirot\ApiClient\Request\Command;
 
@@ -26,7 +26,7 @@ abstract class aClient
      * we keep instance of last method called in our
      * client Object
      *
-     * @var iApiMethod
+     * @var iApiCommand
      */
     protected $method;
 
@@ -50,7 +50,7 @@ abstract class aClient
      *    . build response with platform
      * - return response
      *
-     * @param iApiMethod $method Server Exec Method
+     * @param iApiCommand $method Server Exec Method
      *
      * @throws \Exception
      *
@@ -58,7 +58,7 @@ abstract class aClient
      *
      * @return iResponse
      */
-    function call(iApiMethod $method)
+    function call(iApiCommand $method)
     {
         $platform = $this->platform();
 

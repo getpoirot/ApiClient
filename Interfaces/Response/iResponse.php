@@ -51,9 +51,9 @@ interface iResponse
      * :proc
      * mixed function($originResult);
      *
-     * @param callable $proc
+     * @param callable $callable
      *
      * @return mixed
      */
-    function expected(callable $proc = null);
+    function expected(callable $callable = null);
 }

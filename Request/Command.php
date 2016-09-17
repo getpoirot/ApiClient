@@ -1,14 +1,15 @@
 <?php
 namespace Poirot\ApiClient\Request;
 
-use Poirot\ApiClient\Interfaces\Request\iApiMethod;
+use Poirot\ApiClient\Interfaces\Request\iApiCommand;
 
 use Poirot\Std\ConfigurableSetter;
 use Poirot\Std\Type\StdArray;
 
+
 class Command
     extends ConfigurableSetter
-    implements iApiMethod
+    implements iApiCommand
 {
     /** @var array Method Namespace */
     protected $namespace = array();

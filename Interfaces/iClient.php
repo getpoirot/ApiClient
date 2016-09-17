@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\ApiClient\Interfaces;
 
-use Poirot\ApiClient\Interfaces\Request\iApiMethod;
+use Poirot\ApiClient\Interfaces\Request\iApiCommand;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 
 use Poirot\Connection\Interfaces\iConnection;
@@ -24,7 +24,7 @@ interface iClient
      *    . build response with platform
      * - return response
      *
-     * @param iApiMethod $method Server Exec Method
+     * @param iApiCommand $method Server Exec Method
      *
      * @throws \Exception
      *
@@ -32,7 +32,7 @@ interface iClient
      *
      * @return iResponse
      */
-    function call(iApiMethod $method);
+    function call(iApiCommand $method);
 
     /**
      * Get Client Platform
