@@ -4,45 +4,26 @@ namespace Poirot\ApiClient\Interfaces;
 use Poirot\ApiClient\Interfaces\Request\iApiCommand;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 
-use Poirot\Connection\Interfaces\iConnection;
 
 interface iPlatform
 {
     /**
-     * Prepare Transporter To Make Call
+     * Build Platform Specific Expression To Send Trough Transporter
      *
-     * - validate transporter
-     * - manipulate header or something in transporter
-     * - get connect to resource
+     * @param iApiCommand $command Method Interface
      *
-     * @param iConnection      $transporter
-     * @param iApiCommand|null  $command
-     *
-     * @throws \Exception
-     * @return iConnection
+     * @return iPlatform Self or Copy/Clone
      */
-    function prepareTransporter(iConnection $transporter, $command = null);
+    function withCommand(iApiCommand $command);
 
     /**
-     * Build Platform Specific Expression To Send
-     * Trough Transporter
-     *
-     * @param iApiCommand $method Method Interface
-     *
-     * @return mixed
-     */
-    function makeExpression(iApiCommand $method);
-
-    /**
-     * Build Response Object From Server Result
+     * Build Response with send Expression over Transporter
      *
      * - Result must be compatible with platform
      * - Throw exceptions if response has error
      *
-     * @param mixed $response Server Result
-     *
-     * @throws \Exception
+     * @throws \Exception Command Not Set
      * @return iResponse
      */
-    function makeResponse($response);
+    function send();
 }

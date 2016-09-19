@@ -4,17 +4,9 @@ namespace Poirot\ApiClient\Interfaces;
 use Poirot\ApiClient\Interfaces\Request\iApiCommand;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 
-use Poirot\Connection\Interfaces\iConnection;
 
 interface iClient
 {
-    /**
-     * Get Transporter Adapter
-     *
-     * @return iConnection
-     */
-    function transporter();
-
     /**
      * Execute Request
      *
@@ -24,7 +16,7 @@ interface iClient
      *    . build response with platform
      * - return response
      *
-     * @param iApiCommand $method Server Exec Method
+     * @param iApiCommand $command Server Exec Method
      *
      * @throws \Exception
      *
@@ -32,7 +24,7 @@ interface iClient
      *
      * @return iResponse
      */
-    function call(iApiCommand $method);
+    function call(iApiCommand $command);
 
     /**
      * Get Client Platform

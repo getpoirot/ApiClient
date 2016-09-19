@@ -1,16 +1,20 @@
 <?php
 namespace Poirot\ApiClient;
 
+use Poirot\Connection\Exception\ConnectException;
+use Poirot\Connection\Interfaces\iConnection;
+
+use Poirot\Std\ConfigurableSetter;
+
 use Poirot\ApiClient\Interfaces\iClient;
 use Poirot\ApiClient\Interfaces\iPlatform;
 use Poirot\ApiClient\Interfaces\Request\iApiCommand;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 use Poirot\ApiClient\Request\Command;
 
-use Poirot\Connection\Exception\ConnectException;
-use Poirot\Connection\Interfaces\iConnection;
 
-abstract class aClient 
+abstract class aClient
+    extends ConfigurableSetter
     implements iClient
 {
     ## in case of using magic get method (__get)
@@ -40,7 +44,7 @@ abstract class aClient
      * @return iPlatform
      */
     abstract function platform();
-
+    
     /**
      * Execute Request
      *
@@ -50,7 +54,7 @@ abstract class aClient
      *    . build response with platform
      * - return response
      *
-     * @param iApiCommand $method Server Exec Method
+     * @param iApiCommand $command Server Exec Method
      *
      * @throws \Exception
      *
@@ -58,28 +62,12 @@ abstract class aClient
      *
      * @return iResponse
      */
-    function call(iApiCommand $method)
+    function call(iApiCommand $command)
     {
         $platform = $this->platform();
-
-        $transporter = clone $this->transporter();
-        $transporter = $platform->prepareTransporter($transporter, $method);
-
-        $expression = $platform->makeExpression($method);
-
-        try {
-            if (!$transporter->isConnected())
-                $transporter->getConnect();
-        } catch (\Exception $e) {
-            throw new ConnectException(sprintf(
-                'Error While Connecting To Transporter'
-            ), $e->getCode(), $e);
-        }
-
-        $response = $platform->makeResponse(
-            $transporter->send($expression)
-        );
-
+        $platform = $platform->withCommand($command);
+        $response = $platform->send();
+        
         return $response;
     }
 
