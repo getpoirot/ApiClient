@@ -21,14 +21,14 @@ interface iResponse
      *
      * @return $this
      */
-    function setRawBody($content);
+    function setRawResponse($content);
 
     /**
      * Get Response Origin Body Content
      *
      * @return string|StreamInterface
      */
-    function getRawBody();
+    function getRawResponse();
 
     /**
      * Set Exception

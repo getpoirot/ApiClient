@@ -13,7 +13,7 @@ class ResponseOfClient
     /** @var DataMean */
     protected $meta;
     /** @var string Origin Response Body */
-    protected $rawbody;
+    protected $rawResponse;
 
     /** @var callable */
     protected $defaultExpected;
@@ -53,9 +53,9 @@ class ResponseOfClient
      *
      * @return $this
      */
-    function setRawBody($content)
+    function setRawResponse($content)
     {
-        $this->rawbody = $content;
+        $this->rawResponse = $content;
         return $this;
     }
 
@@ -64,9 +64,9 @@ class ResponseOfClient
      *
      * @return string
      */
-    function getRawBody()
+    function getRawResponse()
     {
-        return $this->rawbody;
+        return $this->rawResponse;
     }
 
     /**
@@ -95,7 +95,7 @@ class ResponseOfClient
      * Default Processor of Expected Result
      *
      * :proc
-     * mixed function($originResult);
+     * mixed function($originResult, $self);
      *
      * @param callable $proc
      *
@@ -111,7 +111,7 @@ class ResponseOfClient
      * Process Raw Body As Result
      *
      * :proc
-     * mixed function($originResult);
+     * mixed function($originResult, $self);
      *
      * @param callable $callable
      *
@@ -122,8 +122,8 @@ class ResponseOfClient
         ($callable !== null) ?: $callable = $this->defaultExpected;
 
         if ($callable !== null)
-            return call_user_func($callable, $this->rawbody);
+            return call_user_func($callable, $this->rawResponse, clone $this);
 
-        return $this->rawbody;
+        return $this->rawResponse;
     }
 }
