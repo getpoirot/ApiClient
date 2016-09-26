@@ -117,7 +117,7 @@ class ResponseOfClient
      *
      * @return mixed
      */
-    function expected(callable $callable = null)
+    function expected(/*callable*/ $callable = null)
     {
         ($callable !== null) ?: $callable = $this->defaultExpected;
 

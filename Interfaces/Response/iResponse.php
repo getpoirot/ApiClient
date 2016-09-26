@@ -55,5 +55,5 @@ interface iResponse
      *
      * @return mixed
      */
-    function expected(callable $callable = null);
+    function expected(/*callable*/ $callable = null);
 }
