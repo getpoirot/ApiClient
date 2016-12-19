@@ -1,7 +1,6 @@
 <?php
 namespace Poirot\ApiClient;
 
-use Poirot\Connection\Exception\ConnectException;
 use Poirot\Connection\Interfaces\iConnection;
 
 use Poirot\Std\ConfigurableSetter;
@@ -84,14 +83,13 @@ abstract class aClient
      */
     function __call($methodName, $args)
     {
-        $method = $this->__method();
+        $method = $this->_method();
         $method->setMethod($methodName);
         $method->setArguments($args);
 
         $this->method = $method;
         return $this->call($this->method);
     }
-
 
     /**
      * __get
@@ -104,10 +102,14 @@ abstract class aClient
      */
     function __get($namespace)
     {
-        return $this->__method()->__get($namespace);
+        $this->_method()->__get($namespace);
+        return $this;
     }
 
-    function __method()
+
+    // ..
+
+    protected function _method()
     {
         if(!$this->method)
             $this->method = new Command;
