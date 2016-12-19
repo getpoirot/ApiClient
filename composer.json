@@ -9,8 +9,8 @@
             , "role": "Developer"
         }
     ]
-    , "require": {
-      "poirot/connection": "dev-devel"
+    , "suggest": {
+      "poirot/connection": "Send Http Requests Over Wire."
     }
     , "target-dir": "Poirot/ApiClient"
     , "autoload"  : {
