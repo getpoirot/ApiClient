@@ -77,7 +77,7 @@ class Command
 
         if ($this->namespace_getter)
             // if request build from getters set namespace and reset state
-            $this->__setNamespaceFromGetters($this->namespace_getter);
+            $this->_setNamespaceFromGetters($this->namespace_getter);
 
         return '';
     }
@@ -95,7 +95,7 @@ class Command
      * @param array $gettersNamespaces Namespaces
      * @return $this
      */
-    protected function __setNamespaceFromGetters(array $gettersNamespaces)
+    protected function _setNamespaceFromGetters(array $gettersNamespaces)
     {
         ($this->_c__namespace) ?: $this->_c__namespace = $this->namespace;
         $this->setNamespace($gettersNamespaces);
