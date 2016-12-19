@@ -1,8 +1,6 @@
 <?php
 namespace Poirot\ApiClient;
 
-use Poirot\Connection\Interfaces\iConnection;
-
 use Poirot\Std\ConfigurableSetter;
 
 use Poirot\ApiClient\Interfaces\iClient;
@@ -22,8 +20,6 @@ abstract class aClient
     ## and Transporter class property
     /** @var iPlatform */
     protected $platform;
-    /** @var iConnection */
-    protected $transporter;
 
     /**
      * we keep instance of last method called in our
