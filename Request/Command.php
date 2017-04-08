@@ -1,10 +1,9 @@
 <?php
 namespace Poirot\ApiClient\Request;
 
-use Poirot\ApiClient\Interfaces\Request\iApiCommand;
 
+use Poirot\ApiClient\Interfaces\Request\iApiCommand;
 use Poirot\Std\ConfigurableSetter;
-use Poirot\Std\Type\StdArray;
 
 
 class Command
@@ -178,10 +177,8 @@ class Command
      */
     function setArguments(array $args)
     {
-        $current    = new StdArray($this->getArguments());
-        $arguments  = $current->withMerge($args);
-        $this->args = $arguments->value; // plain array
-        
+        $arguments  = array_merge($this->getArguments(), $args);
+        $this->args = $arguments;
         return $this;
     }
 
