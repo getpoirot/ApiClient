@@ -9,6 +9,9 @@
             , "role": "Developer"
         }
     ]
+    , "require": {
+        "poirot/std": "dev-devel"
+    }
     , "suggest": {
       "poirot/connection": "Send Http Requests Over Wire."
     }
