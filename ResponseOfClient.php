@@ -100,10 +100,16 @@ class ResponseOfClient
     /**
      * Meta Data Or Headers
      *
+     * @param null|string $metaKey Specific meta key to retrieve
+     *
      * @return array
+     * @return null|mixed When meta key given
      */
-    function getMeta()
+    function getMeta($metaKey = null)
     {
+        if ($metaKey !== null)
+            return (isset($this->meta[$metaKey])) ? $this->meta[$metaKey] : null;
+
         return $this->meta;
     }
 
