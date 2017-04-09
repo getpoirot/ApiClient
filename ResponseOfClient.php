@@ -2,71 +2,66 @@
 namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Interfaces\Response\iResponse;
-use Poirot\Std\ConfigurableSetter;
-use Poirot\Std\Struct\DataMean;
 
 
 class ResponseOfClient
-    extends ConfigurableSetter
     implements iResponse
 {
-    /** @var DataMean */
-    protected $meta;
-    /** @var string Origin Response Body */
-    protected $rawResponse;
+    protected $meta = array();
 
-    /** @var callable */
-    protected $defaultExpected;
+    /** @var string Origin Response Body */
+    protected $rawBody;
 
     /** @var \Exception Exception */
     protected $exception = null;
 
 
     /**
-     * Meta Data Or Headers
+     * iResponse constructor.
      *
-     * @return DataMean
+     * @param string             $rawResponseBody   Response body
+     * @param array|\Traversable $meta              Meta Headers
+     * @param null|\Exception    $exception         Exception
      */
-    function meta()
+    function __construct($rawResponseBody, $meta = null, \Exception $exception = null)
     {
-        if (!$this->meta)
-            $this->meta = new DataMean;
+        $this->rawBody = $rawResponseBody;
 
-        return $this->meta;
+        if ($meta !== null)
+            $this->meta = $this->_assertMetaData($meta);
+
+        if ($exception !== null)
+            $this->exception = $exception;
     }
 
     /**
-     * Setter Helper For Meta Data
-     * @param array|\Traversable $dataSet
-     * @return $this
+     * Set Meta Data Headers
+     *
+     * @param array|\Traversable $data Meta Data Header
+     *
+     * @return $this Clone
      */
-    function setMeta($dataSet)
+    function withMeta($data)
     {
-        $this->meta()->import($dataSet);
-        return $this;
+        $meta = $this->_assertMetaData($data);
+
+        $new = clone $this;
+        $new->meta = array_merge($this->meta, $meta);
+        return $new;
     }
 
     /**
      * Set Response Origin Content
      *
-     * @param string $content Content Body
+     * @param string $rawBody Content Body
      *
      * @return $this
      */
-    function setRawResponse($content)
+    function withRawBody($rawBody)
     {
-        $this->rawResponse = $content;
-        return $this;
-    }
-
-    /**
-     * Get Response Origin Body Content
-     *
-     * @return string
-     */
-    function getRawResponse()
-    {
-        return $this->rawResponse;
+        $new = clone $this;
+        $new->rawBody = $rawBody;
+        return $new;
     }
 
     /**
@@ -75,37 +70,13 @@ class ResponseOfClient
      * @param \Exception $exception Exception
      * @return $this
      */
-    function setException(\Exception $exception)
+    function withException(\Exception $exception)
     {
-        $this->exception = $exception;
-        return $this;
+        $new = clone $this;
+        $new->exception = $exception;
+        return $new;
     }
 
-    /**
-     * Has Exception?
-     *
-     * @return \Exception
-     */
-    function hasException()
-    {
-        return $this->exception;
-    }
-
-    /**
-     * Default Processor of Expected Result
-     *
-     * :proc
-     * mixed function($originResult, $self);
-     *
-     * @param callable $proc
-     *
-     * @return $this
-     */
-    function setDefaultExpected(callable $proc)
-    {
-        $this->defaultExpected = $proc;
-        return $this;
-    }
 
     /**
      * Process Raw Body As Result
@@ -119,11 +90,64 @@ class ResponseOfClient
      */
     function expected(/*callable*/ $callable = null)
     {
-        ($callable !== null) ?: $callable = $this->defaultExpected;
-
         if ($callable !== null)
-            return call_user_func($callable, $this->rawResponse, clone $this);
+            return call_user_func($callable, $this->rawBody, $this);
 
-        return $this->rawResponse;
+        return $this->rawBody;
+    }
+
+
+    /**
+     * Meta Data Or Headers
+     *
+     * @return array
+     */
+    function getMeta()
+    {
+        return $this->meta;
+    }
+
+    /**
+     * Get Response Origin Body Content
+     *
+     * @return string
+     */
+    function getRawBody()
+    {
+        return $this->rawBody;
+    }
+
+    /**
+     * Has Exception?
+     *
+     * @return \Exception
+     */
+    function hasException()
+    {
+        return $this->exception;
+    }
+
+
+    // ..
+
+    /**
+     * Assert Given Meta Data
+     *
+     * @param array|\Traversable $meta
+     *
+     * @return array
+     */
+    protected function _assertMetaData($meta)
+    {
+        if ($meta instanceof \Traversable)
+            $meta = iterator_to_array($meta);
+
+        if (!is_array($meta) && array_values($meta) === $meta)
+            throw new \InvalidArgumentException(sprintf(
+                'Meta Must be Array Or Traversable Associated Key/Value Pair; given: (%s).'
+                , \Poirot\Std\flatten($meta)
+            ));
+
+        return $meta;
     }
 }

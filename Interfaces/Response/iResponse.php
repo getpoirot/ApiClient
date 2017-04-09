@@ -1,42 +1,70 @@
 <?php
 namespace Poirot\ApiClient\Interfaces\Response;
 
-use Poirot\Std\Struct\DataMean;
 
-use Psr\Http\Message\StreamInterface;
-
+/**
+ * Immutable Response Api
+ *
+ */
 interface iResponse
 {
     /**
-     * Meta Data Or Headers
+     * iResponse constructor.
      *
-     * @return DataMean
+     * @param string             $rawResponseBody   Response body
+     * @param array|\Traversable $meta              Meta Headers
+     * @param null|\Exception    $exception         Exception
      */
-    function meta();
+    function __construct($rawResponseBody, $meta = null, \Exception $exception = null);
+
+
+    /**
+     * Set Meta Data Headers
+     *
+     * @param array|\Traversable $data Meta Data Header
+     *
+     * @return $this Clone
+     */
+    function withMeta($data);
 
     /**
      * Set Response Origin Content
      *
-     * @param string|StreamInterface $content Content Body
+     * @param string $rawBody Content Raw Body
      *
-     * @return $this
+     * @return $this Clone
      */
-    function setRawResponse($content);
-
-    /**
-     * Get Response Origin Body Content
-     *
-     * @return string|StreamInterface
-     */
-    function getRawResponse();
+    function withRawBody($rawBody);
 
     /**
      * Set Exception
      *
      * @param \Exception $exception Exception
-     * @return $this
+     * @return $this Clone
      */
-    function setException(\Exception $exception);
+    function withException(\Exception $exception);
+
+
+    /**
+     * Process Raw Body As Expected Result
+     *
+     * :proc
+     * mixed function($originResult, $self);
+     *
+     * @param callable $callable
+     *
+     * @return mixed
+     * @throws \Exception If Has Exception
+     */
+    function expected(/*callable*/ $callable = null);
+
+
+    /**
+     * Meta Data Or Headers
+     *
+     * @return array
+     */
+    function getMeta();
 
     /**
      * Has Exception?
@@ -46,14 +74,9 @@ interface iResponse
     function hasException();
 
     /**
-     * Process Raw Body As Expected Result
+     * Get Response Origin Body Content
      *
-     * :proc
-     * mixed function($originResult);
-     *
-     * @param callable $callable
-     *
-     * @return mixed
+     * @return string
      */
-    function expected(/*callable*/ $callable = null);
+    function getRawBody();
 }
