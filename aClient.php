@@ -80,7 +80,7 @@ abstract class aClient
     function __call($methodName, $args)
     {
         $method = $this->_method();
-        $method->setMethod($methodName);
+        $method->setMethodName($methodName);
         $method->setArguments($args);
 
         $this->method = $method;

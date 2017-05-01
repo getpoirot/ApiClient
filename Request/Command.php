@@ -12,27 +12,18 @@ class Command
 {
     /** @var array Method Namespace */
     protected $namespace = array();
+    /** @var string Method */
+    protected $methodName;
+    /** @var array Method Arguments */
+    protected $args = array();
 
+    /** @var array Cached State of Namespace During Getters Call */
+    protected $_c__namespace = array();
     /**
      * @var array Getter Namespaces Successive
      *            build from getter call
      */
     protected $namespace_getter = array();
-
-    /**
-     * @var array Cached State of Namespace During Getters Call
-     */
-    protected $_c__namespace = array();
-
-    /**
-     * @var string Method
-     */
-    protected $method;
-
-    /**
-     * @var array Method Arguments
-     */
-    protected $args = array();
 
 
     /**
@@ -59,7 +50,7 @@ class Command
      */
     function __call($method, $args)
     {
-        $this->setMethod($method);
+        $this->setMethodName($method);
 
         if (!empty($args) && count($args) == 2
             && $args[0] === null
@@ -152,9 +143,9 @@ class Command
      *
      * @return $this
      */
-    function setMethod($method)
+    function setMethodName($method)
     {
-        $this->method = $method;
+        $this->methodName = $method;
         return $this;
     }
 
@@ -163,9 +154,9 @@ class Command
      *
      * @return string
      */
-    function getMethod()
+    function getMethodName()
     {
-        return $this->method;
+        return $this->methodName;
     }
 
     /**
@@ -177,8 +168,7 @@ class Command
      */
     function setArguments(array $args)
     {
-        $arguments  = array_merge($this->getArguments(), $args);
-        $this->args = $arguments;
+        $this->args = $args;
         return $this;
     }
 
@@ -193,15 +183,5 @@ class Command
     function getArguments()
     {
         return $this->args;
-    }
-
-    /**
-     * Clear All Arguments (to it's default)
-     * @return $this
-     */
-    function clearArguments()
-    {
-        $this->args = array();
-        return $this;
     }
 }
