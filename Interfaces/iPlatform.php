@@ -5,6 +5,15 @@ use Poirot\ApiClient\Interfaces\Request\iApiCommand;
 use Poirot\ApiClient\Interfaces\Response\iResponse;
 
 
+/**
+ * Its Responsible To:
+ *
+ * - Get Commands And Interpret It To Expression Understood By Server
+ * - Made Connection To Server (Lazily)
+ * - Send Expression Over Wire To Server And Translate Server Response
+ *   to Expected Value
+ *
+ */
 interface iPlatform
 {
     /**

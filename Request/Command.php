@@ -26,6 +26,16 @@ class Command
     protected $namespace_getter = array();
 
 
+    function __toString()
+    {
+        $name =
+            implode('\\', $this->getNamespace())
+            . '::' . $this->getMethodName()
+        ;
+
+        return $name;
+    }
+
     /**
      * Get to next successive namespace
      *
