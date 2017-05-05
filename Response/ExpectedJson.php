@@ -17,7 +17,7 @@ class ExpectedJson
      * @return mixed
      * @throws \Exception
      */
-    function __invoke($originResult, iResponse $self)
+    function __invoke($originResult, iResponse $self = null)
     {
         if (false === $result = json_decode($originResult, true))
             throw new \Exception('Server Response Cant Parse To Json.');

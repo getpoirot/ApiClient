@@ -7,7 +7,7 @@ namespace Poirot\ApiClient\Interfaces\Request;
  *
  */
 interface iApiCommand
-    extends \Traversable
+    /* extends \Traversable */
 {
     /**
      * Get Namespace
