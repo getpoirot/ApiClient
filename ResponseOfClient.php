@@ -9,6 +9,7 @@ class ResponseOfClient
 {
     protected $meta = array();
 
+    protected $responseCode;
     /** @var string Origin Response Body */
     protected $rawBody;
 
@@ -20,12 +21,14 @@ class ResponseOfClient
      * iResponse constructor.
      *
      * @param string             $rawResponseBody   Response body
+     * @param int                $responseCode      Response code
      * @param array|\Traversable $meta              Meta Headers
      * @param null|\Exception    $exception         Exception
      */
-    function __construct($rawResponseBody, $meta = null, \Exception $exception = null)
+    function __construct($rawResponseBody, $responseCode = null, $meta = null, \Exception $exception = null)
     {
         $this->rawBody = $rawResponseBody;
+        $this->responseCode = $responseCode;
 
         if ($meta !== null)
             $this->meta = $this->_assertMetaData($meta);
@@ -61,6 +64,20 @@ class ResponseOfClient
     {
         $new = clone $this;
         $new->rawBody = $rawBody;
+        return $new;
+    }
+
+    /**
+     * Set Response Code
+     *
+     * @param string $code Response code
+     *
+     * @return $this
+     */
+    function withResponseCode($code)
+    {
+        $new = clone $this;
+        $new->responseCode = $code;
         return $new;
     }
 
@@ -121,6 +138,16 @@ class ResponseOfClient
     function getRawBody()
     {
         return $this->rawBody;
+    }
+
+    /**
+     * Response Code
+     *
+     * @return int|null
+     */
+    function getResponseCode()
+    {
+        return $this->responseCode;
     }
 
     /**

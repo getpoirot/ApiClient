@@ -12,10 +12,11 @@ interface iResponse
      * iResponse constructor.
      *
      * @param string             $rawResponseBody   Response body
+     * @param int                $responseCode      Response code
      * @param array|\Traversable $meta              Meta Headers
      * @param null|\Exception    $exception         Exception
      */
-    function __construct($rawResponseBody, $meta = null, \Exception $exception = null);
+    function __construct($rawResponseBody, $responseCode = null, $meta = null, \Exception $exception = null);
 
 
     /**
@@ -35,6 +36,15 @@ interface iResponse
      * @return $this Clone
      */
     function withRawBody($rawBody);
+
+    /**
+     * Set Response Code
+     *
+     * @param string $code Response code
+     *
+     * @return $this
+     */
+    function withResponseCode($code);
 
     /**
      * Set Exception
@@ -82,4 +92,11 @@ interface iResponse
      * @return string
      */
     function getRawBody();
+
+    /**
+     * Response Code
+     *
+     * @return int|null
+     */
+    function getResponseCode();
 }
