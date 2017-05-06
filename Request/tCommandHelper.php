@@ -7,6 +7,7 @@ trait tCommandHelper
     /**
      * Get Namespace
      *
+     * @ignore Ignored by getterHydrate
      * @return array
      */
     function getNamespace()
