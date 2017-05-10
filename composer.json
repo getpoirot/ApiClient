@@ -1,6 +1,6 @@
 {
     "name": "poirot/api-client"
-    , "description": "Make Connection To Different Servers, Execute Commands and Get Response."
+    , "description": "Api Client Abstraction Layer that suggest solution to solve general api call problems."
     , "type"       : "library"
     , "authors": [
         {
@@ -10,10 +10,10 @@
         }
     ]
     , "require": {
-        "poirot/std": "dev-devel"
+        "poirot/std": "dev-master"
     }
     , "suggest": {
-      "poirot/connection": "Send Http Requests Over Wire."
+      "poirot/connection": "Send Network Requests Over Wire."
     }
     , "target-dir": "Poirot/ApiClient"
     , "autoload"  : {
@@ -21,7 +21,4 @@
             "Poirot\\ApiClient": "."
         }
     }
-    ,"repositories": [
-      { "type": "git" ,"url": "https://github.com/phPoirot/Connection.git" }
-    ]
 }
