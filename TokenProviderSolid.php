@@ -41,6 +41,6 @@ class TokenProviderSolid
      */
     function exchangeToken()
     {
-        throw new \Exception('Solid Token Exchange Not Implemented.');
+        throw new \Exception('Exchange Method for SolidToken Not Implemented.');
     }
 }
