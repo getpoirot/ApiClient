@@ -10,7 +10,7 @@
         }
     ]
     , "require": {
-        "poirot/std": "dev-master"
+        "poirot/std": "dev-devel"
     }
     , "suggest": {
       "poirot/connection": "Send Network Requests Over Wire."
