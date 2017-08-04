@@ -73,10 +73,14 @@ class AccessTokenObject
     function getDateTimeExpiration()
     {
         if (! $this->datetimeExpiration ) {
-            $exprDateTime = __( new \DateTime() )
-                ->add( new \DateInterval(sprintf('PT%sS', $this->expiresIn)) );
+            if ($this->expiresIn) {
+                // Maybe not include this field
+                $exprDateTime = __( new \DateTime() )
+                    ->add( new \DateInterval(sprintf('PT%sS', $this->expiresIn)) );
 
-            $this->datetimeExpiration = $exprDateTime;
+                $this->datetimeExpiration = $exprDateTime;
+            }
+
         }
 
 
