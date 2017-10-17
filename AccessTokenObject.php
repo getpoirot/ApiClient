@@ -125,6 +125,20 @@ class AccessTokenObject
     }
 
     /**
+     * Note: oauth server return scopes in "scope" field in response
+     * {
+     *   "access_token": "{\"resource_owner\":null,\"meta\":[]}",
+     *   "scope": "profile",
+     *   ..
+     *
+     */
+    function setScope($scope)
+    {
+        $this->setScopes($scope);
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     function getRefreshToken()
