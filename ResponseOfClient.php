@@ -175,11 +175,19 @@ class ResponseOfClient
         if ($meta instanceof \Traversable)
             $meta = iterator_to_array($meta);
 
-        if (!is_array($meta) && array_values($meta) === $meta)
-            throw new \InvalidArgumentException(sprintf(
-                'Meta Must be Array Or Traversable Associated Key/Value Pair; given: (%s).'
-                , \Poirot\Std\flatten($meta)
-            ));
+
+
+        $exception = new \InvalidArgumentException(sprintf(
+            'Meta Must be Array Or Traversable Associated Key/Value Pair; given: (%s).'
+            , \Poirot\Std\flatten($meta)
+        ));
+
+        if (! is_array($meta) )
+            throw $exception;
+
+        if ( array_values($meta) === $meta )
+            throw $exception;
+
 
         return $meta;
     }
