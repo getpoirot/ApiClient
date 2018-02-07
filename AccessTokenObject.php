@@ -21,6 +21,7 @@ class AccessTokenObject
 
     /**
      * Unique Token Identifier
+     * @required
      *
      * @return string|int
      */
