@@ -3,10 +3,11 @@ namespace Poirot\ApiClient;
 
 use Poirot\ApiClient\Interfaces\Token\iAccessTokenObject;
 use Poirot\Std\Struct\aDataOptions;
+use Poirot\Std\Struct\DataOptionsOpen;
 
 
 class AccessTokenObject
-    extends aDataOptions
+    extends DataOptionsOpen
     implements iAccessTokenObject
 {
     protected $accessToken;
