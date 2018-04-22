@@ -9,17 +9,6 @@ namespace Poirot\ApiClient\Interfaces\Response;
 interface iResponse
 {
     /**
-     * iResponse constructor.
-     *
-     * @param string             $rawResponseBody   Response body
-     * @param int                $responseCode      Response code
-     * @param array|\Traversable $meta              Meta Headers
-     * @param null|\Exception    $exception         Exception
-     */
-    function __construct($rawResponseBody, $responseCode = null, $meta = null, \Exception $exception = null);
-
-
-    /**
      * Set Meta Data Headers
      *
      * @param array|\Traversable $data Meta Data Header
