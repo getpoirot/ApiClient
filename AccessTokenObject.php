@@ -1,9 +1,8 @@
 <?php
 namespace Poirot\ApiClient;
 
-use Poirot\ApiClient\Interfaces\Token\iAccessTokenObject;
-use Poirot\Std\Struct\aDataOptions;
 use Poirot\Std\Struct\DataOptionsOpen;
+use Poirot\ApiClient\Interfaces\Token\iAccessTokenObject;
 
 
 class AccessTokenObject
@@ -68,6 +67,7 @@ class AccessTokenObject
     }
 
     /**
+     * //TODO Datetime instead of DateTime
      * Get the token's expiry date time
      *
      * @return \DateTime
@@ -87,6 +87,19 @@ class AccessTokenObject
 
 
         return $this->datetimeExpiration;
+    }
+
+    /**
+     * Set the token's expiry date time
+     *
+     * @param \DateTime $expiration
+     *
+     * @return $this
+     */
+    function setDatetimeExpiration(\DateTime $expiration)
+    {
+        $this->datetimeExpiration = $expiration;
+        return $this;
     }
 
     /**
