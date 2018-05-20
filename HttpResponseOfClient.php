@@ -124,16 +124,20 @@ class HttpResponseOfClient
 
     function _getDataParser()
     {
-        if ( false !== strpos($this->getMeta('content-type'), 'application/json') )
-            // Retrieve Json Parsed Data Result
-            return new ExpectedJson;
-
-
         if ($this->responseCode == 204) {
             return function() {
                 return null;
             };
         }
+
+        if ( false !== strpos($this->getMeta('content-type'), 'application/json') )
+            // Retrieve Json Parsed Data Result
+            return new ExpectedJson;
+        elseif ( false !== strpos($this->getMeta('content-type'), 'text/html') )
+            return function ($raw) {
+                return $raw;
+            };
+
 
         throw new exServerError($this->rawBody);
     }
