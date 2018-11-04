@@ -152,7 +152,10 @@ class HttpResponseOfClient
 
         foreach ($meta as $label => $value) {
             unset($meta[$label]);
-            $meta[strtolower($label)] = strtolower(implode(", ", $value));
+            if ( is_array($value) )
+                $value = implode(", ", $value);
+
+            $meta[strtolower($label)] = $value;
         }
 
         return $meta;

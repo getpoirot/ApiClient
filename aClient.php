@@ -40,7 +40,12 @@ abstract class aClient
         $platform = $this->platform();
         $platform = $platform->withCommand($command);
         $response = $platform->send();
-        
+
+        // add some extra information represent state into response object
+        if ( method_exists($platform, 'getServerUrl') )
+            $response = $response->withMeta(['_url_' => $platform->getServerUrl()]);
+
+
         return $response;
     }
 }
